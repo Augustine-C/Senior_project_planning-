@@ -11,11 +11,14 @@ public class InputReader {
         String[] doNothingInitialState = {"ON_TABLE(a)", "CLEAR(b)", "ON(b,a)", "ARM_EMPTY"};
         String[] notPossibleInitialState = {"ON_TABLE(a)", "ON_TABLE(b)", "CLEAR(a)", "ARM_EMPTY"};
         String[] easyInitialState = {"ON_TABLE(a)", "ON_TABLE(b)", "CLEAR(a)", "CLEAR(b)", "ARM_EMPTY"};
+        String[] paperExampleInitialState = {"ON_TABLE(a)", "ON_TABLE(b)", "ON(c,a)", "CLEAR(b)", "CLEAR(c)", "ARM_EMPTY"};
         String[] sussmanAnomalyInitialState = {"ON_TABLE(a)", "ON_TABLE(b)", "ON(c,a)", "CLEAR(b)", "CLEAR(c)", "ARM_EMPTY"};
+
 
         initialStates.add(doNothingInitialState);
         initialStates.add(notPossibleInitialState);
         initialStates.add(easyInitialState);
+        initialStates.add(paperExampleInitialState);
         initialStates.add(sussmanAnomalyInitialState);
         return initialStates;
     }
@@ -26,11 +29,13 @@ public class InputReader {
         String[] doNothingGoalState = {"ON_TABLE(a)", "CLEAR(b)", "ON(b,a)", "ARM_EMPTY"};
         String[] notPossibleGoalState = {"ON_TABLE(a)", "CLEAR(b)", "ON(b,a)", "ARM_EMPTY"};
         String[] easyGoalState = {"ON_TABLE(a)", "CLEAR(b)", "ON(b,a)", "ARM_EMPTY"};
-        String[] sussmanAnomalyGoalState1 = {"ON_TABLE(b)", "CLEAR(a)", "ON(c,b)", "ON(a,c)", "ARM_EMPTY"};
+        String[] paperExampleGoalState = {"ON_TABLE(b)", "CLEAR(a)", "ON(c,b)", "ON(a,c)", "ARM_EMPTY"};
+        String[] sussmanAnomalyGoalState1 = {"ON_TABLE(c)", "CLEAR(a)", "ON(b,c)", "ON(a,b)", "ARM_EMPTY"};
 
         goalStates.add(doNothingGoalState);
         goalStates.add(notPossibleGoalState);
         goalStates.add(easyGoalState);
+        goalStates.add(paperExampleGoalState);
         goalStates.add(sussmanAnomalyGoalState1);
         return goalStates;
     }
@@ -41,6 +46,7 @@ public class InputReader {
         names.add("Do Nothing");
         names.add("Not Possible");
         names.add("Easy Condition");
+        names.add("Paper Example");
         names.add("Sussman Anomaly");
 
         return names;

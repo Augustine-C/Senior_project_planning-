@@ -15,6 +15,7 @@ public class Main {
         List<String[]> goalStates = InputReader.readGoalStates("");
 
         for (int i = 0; i < names.size(); i++){
+            // TODO: Cannot solve Sussman Anomaly at current stage
             String name = names.get(i);
             String[] initialState = initialStates.get(i);
             String[] goalState = goalStates.get(i);
