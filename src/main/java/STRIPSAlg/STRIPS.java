@@ -76,18 +76,18 @@ public class STRIPS {
     private void replacePrevActionWith(Node newNode) {
 
         // iterate over strings in delList and delete its occurence in currentState
-        for (int i = 0; i < newNode.undoResults.size(); i++) {
+        for (int i = 0; i < newNode.preconditions.size(); i++) {
             for (int j = 0; j < this.currentState.size(); j++) {
-                if ((newNode.undoResults.get(i).toString()).equalsIgnoreCase(this.currentState.get(j).toString())) {
+                if ((newNode.preconditions.get(i).toString()).equalsIgnoreCase(this.currentState.get(j).toString())) {
                     this.currentState.remove(j);
                     break;
                 }
             }
         }
 
-        // add from doResults of action in currentState
-        for (int i = 0; i < newNode.doResults.size(); i++) {
-            this.currentState.add(new StackElement(newNode.doResults.get(i).toString()));
+        // add from results of action in currentState
+        for (int i = 0; i < newNode.results.size(); i++) {
+            this.currentState.add(new StackElement(newNode.results.get(i).toString()));
         }
     }
 
@@ -106,19 +106,8 @@ public class STRIPS {
         }
 
         // do node Results
-        for (int i = 0; i < node.doResults.size(); i++) {
-            String[] blo = node.doResults.get(i).items;
-            for (int j = 0; blo != null && j < blo.length; j++) {
-                if (blo[j].equalsIgnoreCase(target)) {
-                    blo[j] = replacement;
-                    break;
-                }
-            }
-        }
-
-        // undo node results
-        for (int i = 0; i < node.undoResults.size(); i++) {
-            String[] blo = node.undoResults.get(i).items;
+        for (int i = 0; i < node.results.size(); i++) {
+            String[] blo = node.results.get(i).items;
             for (int j = 0; blo != null && j < blo.length; j++) {
                 if (blo[j].equalsIgnoreCase(target)) {
                     blo[j] = replacement;

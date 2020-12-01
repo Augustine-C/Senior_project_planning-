@@ -8,16 +8,16 @@ public class Init {
     public static LinkedList<Node> initializeActionList() {
         LinkedList<Node> nodeList = new LinkedList<>();
 
-        Node stack = new Node("STACK(top,bottom)", "CLEAR(bottom) HOLDING(top)", "ARM_EMPTY ON(top,bottom) CLEAR(top)", "CLEAR(bottom) HOLDING(top)");
+        Node stack = new Node("STACK(top,bottom)", "CLEAR(bottom) HOLDING(top)", "ARM_EMPTY ON(top,bottom) CLEAR(top)");
         nodeList.add(stack);
 
-        Node unstack = new Node("UNSTACK(top,bottom)", "ON(top,bottom) CLEAR(top) ARM_EMPTY", "clear(bottom) HOLDING(top)", "ON(top,bottom) CLEAR(top) ARM_EMPTY");
+        Node unstack = new Node("UNSTACK(top,bottom)", "ON(top,bottom) CLEAR(top) ARM_EMPTY", "clear(bottom) HOLDING(top)");
         nodeList.add(unstack);
 
-        Node pickUp = new Node("PICK_UP(item)", "CLEAR(item) ON_TABLE(item) ARM_EMPTY", "HOLDING(item)", "CLEAR(item) ON_TABLE(item) ARM_EMPTY");
+        Node pickUp = new Node("PICK_UP(item)", "CLEAR(item) ON_TABLE(item) ARM_EMPTY", "HOLDING(item)");
         nodeList.add(pickUp);
 
-        Node putDown = new Node("PUT_DOWN(item)", "HOLDING(item)", "ON_TABLE(item) CLEAR(item) ARM_EMPTY", "HOLDING(item)");
+        Node putDown = new Node("PUT_DOWN(item)", "HOLDING(item)", "ON_TABLE(item) CLEAR(item) ARM_EMPTY");
         nodeList.add(putDown);
 
         return nodeList;
