@@ -7,6 +7,8 @@ import java.util.List;
 
 public class Main {
 
+    final static Boolean PRINT_GOAL_STACK = false;
+
     public static void main(String[] args) {
         List<String> names = InputReader.readNames("");
         List<String[]> initialStates = InputReader.readInitStates("");
@@ -17,7 +19,7 @@ public class Main {
             String[] initialState = initialStates.get(i);
             String[] goalState = goalStates.get(i);
 
-            STRIPS strips = new STRIPS(initialState, goalState);
+            STRIPS strips = new STRIPS(initialState, goalState, PRINT_GOAL_STACK);
             List<String> plan = strips.getPlanWithString();
 
             ResultWriter.writeResult(plan, name, initialState, goalState, OutputFormat.PRINT_ONLY);

@@ -4,16 +4,18 @@ import java.util.*;
 
 public class STRIPS {
 
-    Stack<SubGoal> goalStack;  // The Goal Stack
-    LinkedList<StackElement> currentState; // The current state we have
-    LinkedList<StackElement> goalState; // The goal state that we want to achieve
-    List<Action> actionList; // The List that stored all the possible Actions
-    List<Action> planWithAction; // The action plan in Action type
-    List<String> planWithString; // The action plan in String type
-    Boolean completedAtStart;
+    private Stack<SubGoal> goalStack;  // The Goal Stack
+    private LinkedList<StackElement> currentState; // The current state we have
+    private LinkedList<StackElement> goalState; // The goal state that we want to achieve
+    private List<Action> actionList; // The List that stored all the possible Actions
+    private List<Action> planWithAction; // The action plan in Action type
+    private List<String> planWithString; // The action plan in String type
+    private Boolean completedAtStart;
     private boolean notPossibleState;
+    private boolean printGoalStack;
+    private int whileLoopCount = 0;
 
-    public STRIPS(String[] initStatesArr, String[] goalStackArr) {
+    public STRIPS(String[] initStatesArr, String[] goalStackArr, Boolean printGoalStack) {
         this.planWithString = new LinkedList<>();
         this.planWithAction = new LinkedList<>();
         this.goalState = new LinkedList<>();
@@ -24,17 +26,31 @@ public class STRIPS {
         this.goalState = Init.initializeGoalStateWith(goalStackArr);
         this.completedAtStart = Arrays.equals(initStatesArr, goalStackArr);
         this.notPossibleState = false;
+        this.printGoalStack = printGoalStack;
     }
 
     public List<String> getPlanWithString() {
         if (completedAtStart){
             return new ArrayList<>();
         }
+        if (printGoalStack){
+            System.out.println();
+            System.out.println("------------------------------");
+            System.out.println("Debug Information - Goal Stack");
+            System.out.println("------------------------------");
+
+        }
         while (!goalStack.empty()) {
             attemptNextGoal();
             if (notPossibleState){
                 return new ArrayList<>(Arrays.asList("NOT_POSSIBLE"));
             }
+        }
+        if (printGoalStack){
+            System.out.println("-------------------------------------");
+            System.out.println("End of Debug Information - Goal Stack");
+            System.out.println("-------------------------------------");
+            System.out.println();
         }
         return planWithString;
     }
@@ -49,6 +65,11 @@ public class STRIPS {
             planMultiPartGoal(nextGoal);
         } else { // The goal is single part goal
             planSinglePartGoal(nextGoal, goal);
+        }
+        if (printGoalStack){
+            System.out.println(String.format("While Loop Count: %d", whileLoopCount));
+            System.out.println(goalStack);
+            whileLoopCount++;
         }
     }
 
