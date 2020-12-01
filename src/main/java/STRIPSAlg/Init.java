@@ -5,22 +5,22 @@ import java.util.Stack;
 
 public class Init {
 
-    public static LinkedList<Action> initializeActionList() {
-        LinkedList<Action> actionList = new LinkedList<>();
+    public static LinkedList<Node> initializeActionList() {
+        LinkedList<Node> nodeList = new LinkedList<>();
 
-        Action stack = new Action("STACK(top,bottom)", "CLEAR(bottom) HOLDING(top)", "ARM_EMPTY ON(top,bottom) CLEAR(top)", "CLEAR(bottom) HOLDING(top)");
-        actionList.add(stack);
+        Node stack = new Node("STACK(top,bottom)", "CLEAR(bottom) HOLDING(top)", "ARM_EMPTY ON(top,bottom) CLEAR(top)", "CLEAR(bottom) HOLDING(top)");
+        nodeList.add(stack);
 
-        Action unstack = new Action("UNSTACK(top,bottom)", "ON(top,bottom) CLEAR(top) ARM_EMPTY", "clear(bottom) HOLDING(top)", "ON(top,bottom) CLEAR(top) ARM_EMPTY");
-        actionList.add(unstack);
+        Node unstack = new Node("UNSTACK(top,bottom)", "ON(top,bottom) CLEAR(top) ARM_EMPTY", "clear(bottom) HOLDING(top)", "ON(top,bottom) CLEAR(top) ARM_EMPTY");
+        nodeList.add(unstack);
 
-        Action pickUp = new Action("PICK_UP(item)", "CLEAR(item) ON_TABLE(item) ARM_EMPTY", "HOLDING(item)", "CLEAR(item) ON_TABLE(item) ARM_EMPTY");
-        actionList.add(pickUp);
+        Node pickUp = new Node("PICK_UP(item)", "CLEAR(item) ON_TABLE(item) ARM_EMPTY", "HOLDING(item)", "CLEAR(item) ON_TABLE(item) ARM_EMPTY");
+        nodeList.add(pickUp);
 
-        Action putDown = new Action("PUT_DOWN(item)", "HOLDING(item)", "ON_TABLE(item) CLEAR(item) ARM_EMPTY", "HOLDING(item)");
-        actionList.add(putDown);
+        Node putDown = new Node("PUT_DOWN(item)", "HOLDING(item)", "ON_TABLE(item) CLEAR(item) ARM_EMPTY", "HOLDING(item)");
+        nodeList.add(putDown);
 
-        return actionList;
+        return nodeList;
     }
 
     public static LinkedList<StackElement> initializeCurrentStateWith(String[] states) {

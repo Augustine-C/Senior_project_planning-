@@ -2,7 +2,7 @@ package STRIPSAlg;
 
 import java.util.ArrayList;
 
-public class Action {
+public class Node {
 
     public StackElement actionName;
     public ArrayList<StackElement> preconditions = new ArrayList<>();
@@ -10,7 +10,8 @@ public class Action {
     public ArrayList<StackElement> undoResults = new ArrayList<>();
 
 
-    public Action(String name, String preconditions, String doResults, String undoResults) {
+    public Node(String name, String preconditions, String doResults, String undoResults) {
+        // TODO: undo result is the same as preconditions
         actionName = new StackElement(name);
 
         for (String precondition : preconditions.split(" ")){
@@ -40,7 +41,7 @@ public class Action {
     }
 
     @Override
-    public Action clone() {
+    public Node clone() {
         ArrayList<String> preconditionsStringList = new ArrayList<>();
         for (StackElement precondition : this.preconditions){
             preconditionsStringList.add(precondition.toString());
@@ -56,7 +57,7 @@ public class Action {
             undoResultsStringList.add(undoResult.toString());
         }
 
-        return new Action(
+        return new Node(
                 actionName.toString(),
                 String.join(" ", preconditionsStringList),
                 String.join(" ", doResultsStringList),

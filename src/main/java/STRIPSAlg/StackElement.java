@@ -10,7 +10,7 @@ public class StackElement {
                                         // Example: "HOLDING", "ON_TABLE", "ON", "ARM_EMPTY"
     public String[] items;
 
-    public StackElement(String stateString) {
+    public StackElement(String stateString) { // ON(C,B)
         int openBracket = stateString.indexOf('(');
         int closeBracket = stateString.indexOf(')');
 
