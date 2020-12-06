@@ -2,23 +2,23 @@ package STRIPSAlg;
 
 import java.util.ArrayList;
 
-public class Node {
+public class Action {
 
-    public StackElement actionName;
-    public ArrayList<StackElement> preconditions = new ArrayList<>();
-    public ArrayList<StackElement> results = new ArrayList<>();
+    public Condition action;
+    public ArrayList<Condition> preconditions = new ArrayList<>();
+    public ArrayList<Condition> results = new ArrayList<>();
 
 
-    public Node(String name, String preconditions, String results) {
+    public Action(String name, String preconditions, String results) {
         // TODO: undo result is the same as preconditions
-        actionName = new StackElement(name);
+        action = new Condition(name);
 
         for (String precondition : preconditions.split(" ")){
-            this.preconditions.add(new StackElement(precondition));
+            this.preconditions.add(new Condition(precondition));
         }
 
         for (String result: results.split(" ")) {
-            this.results.add(new StackElement(result));
+            this.results.add(new Condition(result));
         }
     }
 
@@ -36,19 +36,19 @@ public class Node {
     }
 
     @Override
-    public Node clone() {
+    public Action clone() {
         ArrayList<String> preconditionsStringList = new ArrayList<>();
-        for (StackElement precondition : this.preconditions){
+        for (Condition precondition : this.preconditions){
             preconditionsStringList.add(precondition.toString());
         }
 
         ArrayList<String> resultsStringList = new ArrayList<>();
-        for (StackElement result : this.results){
+        for (Condition result : this.results){
             resultsStringList.add(result.toString());
         }
 
-        return new Node(
-                actionName.toString(),
+        return new Action(
+                action.toString(),
                 String.join(" ", preconditionsStringList),
                 String.join(" ", resultsStringList)
         );
@@ -56,7 +56,7 @@ public class Node {
 
     @Override
     public String toString() {
-        return ("action: " + actionName
+        return ("action: " + action
                 + "\n  preconditions: " + preconditions
                 + "\n  results:          " + results);
     }

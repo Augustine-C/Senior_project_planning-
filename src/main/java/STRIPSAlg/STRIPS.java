@@ -1,35 +1,39 @@
 package STRIPSAlg;
 
+import utils.Init;
+import utils.StuckDetector;
+import utils.StuckException;
+import utils.UnsolvableException;
+
 import java.util.*;
 
 public class STRIPS {
 
     private Stack<SubGoal> goalStack;  // The Goal Stack
-    private LinkedList<StackElement> currentState; // The current state we have
-    private LinkedList<StackElement> goalState; // The goal state that we want to achieve
-    private List<Node> nodeList; // The List that stored all the possible Actions
-    private List<Node> planWithNodes; // The action plan in Node type
+    private LinkedList<Condition> currentState; // The current state we have
+    private LinkedList<Condition> goalState; // The goal state that we want to achieve
+    private List<Action> actionList; // The List that stored all the possible Actions
+    private List<Action> planWithActions; // The action plan in Action type
     private List<String> planWithString; // The action plan in String type
     private Boolean completedAtStart;
-    private boolean notPossibleState;
     private boolean printGoalStack;
     private int whileLoopCount = 0;
+    private LinkedList<String[]> goalStackLogs = new LinkedList<>();
 
     public STRIPS(String[] initStatesArr, String[] goalStackArr, Boolean printGoalStack) {
         this.planWithString = new LinkedList<>();
-        this.planWithNodes = new LinkedList<>();
+        this.planWithActions = new LinkedList<>();
         this.goalState = new LinkedList<>();
 
-        this.nodeList = Init.initializeActionList();
+        this.actionList = Init.initializeActionList();
         this.currentState = Init.initializeCurrentStateWith(initStatesArr);
         this.goalStack = Init.initializeGoalStackWith(goalStackArr);
         this.goalState = Init.initializeGoalStateWith(goalStackArr);
         this.completedAtStart = Arrays.equals(initStatesArr, goalStackArr);
-        this.notPossibleState = false;
         this.printGoalStack = printGoalStack;
     }
 
-    public List<String> getPlanWithString() {
+    public List<String> getPlanWithString() throws UnsolvableException, StuckException {
         if (completedAtStart){
             return new ArrayList<>();
         }
@@ -42,8 +46,9 @@ public class STRIPS {
         }
         while (!goalStack.empty()) {
             attemptNextGoal();
-            if (notPossibleState){
-                return new ArrayList<>(Arrays.asList("NOT_POSSIBLE"));
+            goalStackLogs.add(goalStack.toString().split(","));
+            if (StuckDetector.detectCycle(goalStackLogs)){
+                throw new StuckException();
             }
         }
         if (printGoalStack){
@@ -55,9 +60,9 @@ public class STRIPS {
         return planWithString;
     }
 
-    public void attemptNextGoal() {
+    public void attemptNextGoal() throws UnsolvableException {
         SubGoal nextGoal = goalStack.peek();
-        StackElement goal = new StackElement(nextGoal.goal);
+        Condition goal = new Condition(nextGoal.goal);
 
         if (nextGoal.isAction) {
             generateActionPlanWithString(nextGoal, goal);
@@ -73,12 +78,10 @@ public class STRIPS {
         }
     }
 
-    private void replacePrevActionWith(Node newNode) {
-
-        // iterate over strings in delList and delete its occurence in currentState
-        for (int i = 0; i < newNode.preconditions.size(); i++) {
+    private void doAction(Action newAction) {
+        for (int i = 0; i < newAction.preconditions.size(); i++) {
             for (int j = 0; j < this.currentState.size(); j++) {
-                if ((newNode.preconditions.get(i).toString()).equalsIgnoreCase(this.currentState.get(j).toString())) {
+                if(newAction.preconditions.get(i).equals(this.currentState.get(j))){
                     this.currentState.remove(j);
                     break;
                 }
@@ -86,59 +89,57 @@ public class STRIPS {
         }
 
         // add from results of action in currentState
-        for (int i = 0; i < newNode.results.size(); i++) {
-            this.currentState.add(new StackElement(newNode.results.get(i).toString()));
+        for (int i = 0; i < newAction.results.size(); i++) {
+            this.currentState.add(new Condition(newAction.results.get(i).toString()));
         }
     }
 
-    private void replaceBlockNames(Node node, String target, String replacement) {
-        // replace all occurence in node target with replecemant in:
+    private void replaceBlockNames(Action action, String target, String replacement) {
+        // replace all occurence in action target with replecemant in:
 
         // preconditions
-        for (int i = 0; i < node.preconditions.size(); i++) {
-            String[] blo = node.preconditions.get(i).items;
-            for (int j = 0; blo != null && j < blo.length; j++) {
-                if (blo[j].equalsIgnoreCase(target)) {
-                    blo[j] = replacement;
+        for (int i = 0; i < action.preconditions.size(); i++) {
+            String[] blocks = action.preconditions.get(i).items;
+            for (int j = 0; blocks != null && j < blocks.length; j++) {
+                if (blocks[j].equalsIgnoreCase(target)) {
+                    blocks[j] = replacement;
                     break;
                 }
             }
         }
 
-        // do node Results
-        for (int i = 0; i < node.results.size(); i++) {
-            String[] blo = node.results.get(i).items;
-            for (int j = 0; blo != null && j < blo.length; j++) {
-                if (blo[j].equalsIgnoreCase(target)) {
-                    blo[j] = replacement;
+        // do action Results
+        for (int i = 0; i < action.results.size(); i++) {
+            String[] blocks = action.results.get(i).items;
+            for (int j = 0; blocks != null && j < blocks.length; j++) {
+                if (blocks[j].equalsIgnoreCase(target)) {
+                    blocks[j] = replacement;
                     break;
                 }
             }
         }
 
-        // actionName
-        String[] blo = node.actionName.items;
-        for (int j = 0; blo != null && j < blo.length; j++) {
-            if (blo[j].equalsIgnoreCase(target)) {
-                blo[j] = replacement;
+        String[] blocks = action.action.items;
+        for (int j = 0; blocks != null && j < blocks.length; j++) {
+            if (blocks[j].equalsIgnoreCase(target)) {
+                blocks[j] = replacement;
                 break;
             }
         }
     }
 
-    private void generateActionPlanWithString(SubGoal subGoal, StackElement goal) {
-        // This method will convert the plan using Node type to plan using String type
-        for (int i = 0; i < planWithNodes.size(); i++) {
-            if ((goal.nameOfActionOrState).equalsIgnoreCase(planWithNodes.get(i).actionName.nameOfActionOrState)
-                    && (goal.items[0]).equalsIgnoreCase(planWithNodes.get(i).actionName.items[0])) {
+    private void generateActionPlanWithString(SubGoal subGoal, Condition goal) {
+        // This method will convert the plan using Action type to plan using String type
+        for (int i = 0; i < planWithActions.size(); i++) {
+            if ((goal.equals(planWithActions.get(i).action))) {
                 // Get the action and store the result from either do that action or undo that action
-                replacePrevActionWith(planWithNodes.get(i));
+                doAction(planWithActions.get(i));
                 // Remove the action from the Goal Stack
                 goalStack.pop();
                 // Store the sub goal that achieved by the action to the plan and remove the sub goal from Goal Stack
                 planWithString.add(subGoal.goal);
                 // Remove the action from the list
-                planWithNodes.remove(i);
+                planWithActions.remove(i);
                 break;
             }
         }
@@ -150,7 +151,7 @@ public class STRIPS {
 
         for (String goalPart : multiPartGoals){
             goalFullyAchieved = true;
-            for (StackElement statePart : currentState){
+            for (Condition statePart : currentState){
                 if (goalPart.equalsIgnoreCase(statePart.toString())) {
                     goalFullyAchieved = false;
                     break;
@@ -173,7 +174,7 @@ public class STRIPS {
         }
     }
 
-    private void planSinglePartGoal(SubGoal subGoal, StackElement stackElement) {
+    private void planSinglePartGoal(SubGoal subGoal, Condition condition) throws UnsolvableException {
         boolean subGoalRemoved = false;
 
         for (int i = 0; i < currentState.size(); i++) {
@@ -188,22 +189,22 @@ public class STRIPS {
         if (!subGoalRemoved) {
             // If we did not achieved the sub goal, we will find the best actions to achieve it.
             // After that, we will store it in the stack
-            Node clone = findBestAction(stackElement);
-            if (clone == null && notPossibleState){
+            Action clone = findBestAction(condition);
+            if (clone == null){
                 return;
             }
-            planWithNodes.add(clone);
+            planWithActions.add(clone);
             storeActionOnStack(clone);
         }
     }
 
-    private void storeActionOnStack(Node clonedNode) {
-        // Store the Node in the GoalStack
-        this.goalStack.push(new SubGoal(clonedNode.actionName.toString(), false, true));
+    private void storeActionOnStack(Action clonedAction) {
+        // Store the Action in the GoalStack
+        this.goalStack.push(new SubGoal(clonedAction.action.toString(), false, true));
 
         // Store the Preconditions for an action in the GoalStack
         List<String> clonedPreconditionsStringList = new ArrayList<>();
-        for (StackElement precondition : clonedNode.preconditions) {
+        for (Condition precondition : clonedAction.preconditions) {
             clonedPreconditionsStringList.add(precondition.toString());
         }
         String clonedPreconditionsString = String.join(" ", clonedPreconditionsStringList);
@@ -212,13 +213,13 @@ public class STRIPS {
         this.goalStack.push(new SubGoal(clonedPreconditionsString, true, false));
 
         // Store the single part goals in the GoalStack
-        for (int i = 0; i < clonedNode.preconditions.size(); i++) {
-            goalStack.push(new SubGoal(clonedNode.preconditions.get(i).toString(), false, false));
+        for (int i = 0; i < clonedAction.preconditions.size(); i++) {
+            goalStack.push(new SubGoal(clonedAction.preconditions.get(i).toString(), false, false));
         }
     }
 
-    private Node findBestAction(StackElement goal) {
-        Node currentNode = null;
+    private Action findBestAction(Condition goal) throws UnsolvableException {
+        Action currentAction = null;
 
         String[] items = new String[2];
 
@@ -227,21 +228,21 @@ public class STRIPS {
             for (int i = 0; i < currentState.size(); i++) {
                 if (currentState.get(i).nameOfActionOrState.equalsIgnoreCase("ON")
                         && currentState.get(i).items[0].equalsIgnoreCase(goal.items[0])) {
-                    currentNode = getAction("UNSTACK");
+                    currentAction = getAction("UNSTACK");
 
                     items[0] = currentState.get(i).items[0];
                     items[1] = currentState.get(i).items[1];
                 }
             }
-            if (currentNode == null) {
-                currentNode = getAction("PICK_UP");
+            if (currentAction == null) {
+                currentAction = getAction("PICK_UP");
 
                 items[0] = goal.items[0];
             }
         } else if (goal.nameOfActionOrState.equalsIgnoreCase("ARM_EMPTY")) {
             // If we want to get our ARM_EMPTY, there are two actions we can take: STACK or PUT_DOWN
             // We will use the cloneActionHelper to determine which one is the best
-            currentNode = cloneActionHelper(null, items);
+            currentAction = cloneActionHelper(null, items);
         } else if (goal.nameOfActionOrState.equalsIgnoreCase("CLEAR")) {
             // If we want to get an item CLEAR, there are three actions we can take: STACK, UNSTACK, or PUT_DOWN
             boolean isHoldingItem = false;
@@ -256,13 +257,13 @@ public class STRIPS {
             if (isHoldingItem) {
                 // If we are HOLDING an item now, we need to put it down some way
                 // We will use the cloneActionHelper to determine which way is the best
-                currentNode = cloneActionHelper(null, items);
+                currentAction = cloneActionHelper(null, items);
             } else {
                 // If we are not HOLDING any item. Alternatively, we have our ARM_EMPTY
                 for (int i = 0; i < currentState.size(); i++) {
                     if (currentState.get(i).nameOfActionOrState.equalsIgnoreCase("ON")
                             && currentState.get(i).items[1].equalsIgnoreCase(goal.items[0])) {
-                        currentNode = getAction("UNSTACK");
+                        currentAction = getAction("UNSTACK");
 
                         items[0] = currentState.get(i).items[0];
                         items[1] = currentState.get(i).items[1];
@@ -272,10 +273,10 @@ public class STRIPS {
                 }
             }
         } else {
-            // If we are not working on StateDescriptions, we will do an Node
-            for (int i = 0; i < nodeList.size(); i++) {
-                if (nodeList.get(i).isGoalAchieved(goal.nameOfActionOrState)) {
-                    currentNode = nodeList.get(i);
+            // If we are not working on StateDescriptions, we will do an Action
+            for (int i = 0; i < actionList.size(); i++) {
+                if (actionList.get(i).isGoalAchieved(goal.nameOfActionOrState)) {
+                    currentAction = actionList.get(i);
 
                     for (int j = 0; j < goal.items.length; j++) {
                         items[j] = goal.items[j];
@@ -285,37 +286,36 @@ public class STRIPS {
             }
         }
 
-        if (currentNode == null){
-            this.notPossibleState = true;
-            return null;
+        if (currentAction == null){
+            throw new UnsolvableException();
         }
 
-        // make clone of action so that we can add it to the planWithNodes list
-        Node clonedNode = currentNode.clone();
+        // make clone of action so that we can add it to the planWithActions list
+        Action clonedAction = currentAction.clone();
 
-        // replace block names using clones so that we can add it to the planWithNodes list
-        for (int j = 0; j < clonedNode.actionName.items.length; j++) {
-            replaceBlockNames(clonedNode, clonedNode.actionName.items[j], items[j]);
+        // replace block names using clones so that we can add it to the planWithActions list
+        for (int j = 0; j < clonedAction.action.items.length; j++) {
+            replaceBlockNames(clonedAction, clonedAction.action.items[j], items[j]);
         }
 
-        return clonedNode;
+        return clonedAction;
     }
 
-    private Node cloneActionHelper(Node node, String[] items) {
+    private Action cloneActionHelper(Action action, String[] items) {
         for (int i = 0; i < goalState.size(); i++) {
             for (int j = 0; j < currentState.size(); j++) {
                 if (goalState.get(i).nameOfActionOrState.equalsIgnoreCase("ON")
                         && currentState.get(j).nameOfActionOrState.equalsIgnoreCase("HOLDING")
                         && goalState.get(i).items[0].equalsIgnoreCase(currentState.get(j).items[0])) {
-                    node = getAction("STACK");
+                    action = getAction("STACK");
 
                     items[0] = goalState.get(i).items[0];
                     items[1] = goalState.get(i).items[1];
                 }
             }
         }
-        if (node == null) {
-            node = getAction("PUT_DOWN");
+        if (action == null) {
+            action = getAction("PUT_DOWN");
 
             for (int i = 0; i < currentState.size(); i++) {
                 if (currentState.get(i).nameOfActionOrState.equalsIgnoreCase("HOLDING")) {
@@ -325,13 +325,13 @@ public class STRIPS {
                 }
             }
         }
-        return node;
+        return action;
     }
 
-    private Node getAction(String actionName) {
-        for (int i = 0; i < nodeList.size(); i++) {
-            if (nodeList.get(i).actionName.nameOfActionOrState.equalsIgnoreCase(actionName)) {
-                return nodeList.get(i);
+    private Action getAction(String actionName) {
+        for (int i = 0; i < actionList.size(); i++) {
+            if (actionList.get(i).action.nameOfActionOrState.equalsIgnoreCase(actionName)) {
+                return actionList.get(i);
             }
         }
         return null;

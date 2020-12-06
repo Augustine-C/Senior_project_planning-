@@ -2,15 +2,15 @@ package STRIPSAlg;
 
 import java.util.Arrays;
 
-public class StackElement {
+public class Condition {
 
-    public String nameOfActionOrState;  // If the StackElement records an action, this will be the name of that action
+    public String nameOfActionOrState;  // If the Condition records an action, this will be the name of that action
                                         // Example: "PICK_UP", "STACK", "UNSTACK", "PUT_DOWN"
                                         // Otherwise, it will record the name of the State Description
                                         // Example: "HOLDING", "ON_TABLE", "ON", "ARM_EMPTY"
     public String[] items;
 
-    public StackElement(String stateString) { // ON(C,B)
+    public Condition(String stateString) { // ON(C,B)
         int openBracket = stateString.indexOf('(');
         int closeBracket = stateString.indexOf(')');
 
@@ -35,8 +35,8 @@ public class StackElement {
         return stateDescString;
     }
 
-    public Boolean match(StackElement element){
-        return this.nameOfActionOrState.equals(element.nameOfActionOrState)
-                && Arrays.equals(this.items, element.items);
+    @Override
+    public boolean equals(Object element){
+        return this.toString().equalsIgnoreCase(element.toString());
     }
 }
