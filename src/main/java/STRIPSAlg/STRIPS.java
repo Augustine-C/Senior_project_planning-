@@ -68,8 +68,10 @@ public class STRIPS {
                 goalStack.pop();
         } else if (nextGoal.goalType == GoalType.MultiPartGoal) {
             planMultiPartGoal(nextGoal);
-        } else { // The goal is single part goal
+        } else if (nextGoal.goalType == GoalType.SinglePartGoal){ // The goal is single part goal
             planSinglePartGoal(nextGoal);
+        } else {
+            throw new IllegalStateException("[STRIPS.attemptNextGoal] The goal is not an Action, not a SinglePartGoal, also not a MultiPartGoal");
         }
 
         if (printGoalStack){
@@ -201,7 +203,7 @@ public class STRIPS {
                 }
             }
             return !goalNotFullyAchieved;
-        } else {
+        } else if (goal.goalType == GoalType.SinglePartGoal) {
             boolean goalAchieved = false;
 
             for (Condition condition : currentState) {
@@ -212,6 +214,8 @@ public class STRIPS {
                 }
             }
             return goalAchieved;
+        } else {
+            throw new IllegalStateException("[STRIPS.isGoalFullyAchieved] The goal is nether a SinglePartGoal, nor a MultiPartGoal");
         }
     }
 
@@ -361,6 +365,6 @@ public class STRIPS {
                 return allAction.clone();
             }
         }
-        return null;
+        throw new IllegalStateException("[STRIPS.getAction] No Such Action named: <" + actionName + ">");
     }
 }
