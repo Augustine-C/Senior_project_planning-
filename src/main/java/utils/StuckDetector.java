@@ -9,7 +9,7 @@ public class StuckDetector {
     public static boolean detectCycle(LinkedList<String[]> head)
     {
         Iterator<String[]> itr = head.iterator();
-        Set<String[]> set = new HashSet();
+        Set<String[]> set = new HashSet<>();
 
         String[] curr;
         int cycleCount = 0;

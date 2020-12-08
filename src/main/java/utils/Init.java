@@ -2,54 +2,54 @@ package utils;
 
 import STRIPSAlg.Action;
 import STRIPSAlg.Condition;
-import STRIPSAlg.SubGoal;
+import STRIPSAlg.Goal;
 
 import java.util.LinkedList;
 import java.util.Stack;
 
 public class Init {
 
-    public static LinkedList<Action> initializeActionList() {
-        LinkedList<Action> actionList = new LinkedList<>();
+    public static LinkedList<Action> initializeAllActions() {
+        LinkedList<Action> allActions = new LinkedList<>();
 
         Action stack = new Action("STACK(top,bottom)", "CLEAR(bottom) HOLDING(top)", "ARM_EMPTY ON(top,bottom) CLEAR(top)");
-        actionList.add(stack);
+        allActions.add(stack);
 
         Action unstack = new Action("UNSTACK(top,bottom)", "ON(top,bottom) CLEAR(top) ARM_EMPTY", "clear(bottom) HOLDING(top)");
-        actionList.add(unstack);
+        allActions.add(unstack);
 
         Action pickUp = new Action("PICK_UP(item)", "CLEAR(item) ON_TABLE(item) ARM_EMPTY", "HOLDING(item)");
-        actionList.add(pickUp);
+        allActions.add(pickUp);
 
         Action putDown = new Action("PUT_DOWN(item)", "HOLDING(item)", "ON_TABLE(item) CLEAR(item) ARM_EMPTY");
-        actionList.add(putDown);
+        allActions.add(putDown);
 
-        return actionList;
+        return allActions;
     }
 
     public static LinkedList<Condition> initializeCurrentStateWith(String[] states) {
         LinkedList<Condition> currentState = new LinkedList<>();
-        for (int i = 0; i < states.length; i++) {
-            currentState.add(new Condition(states[i]));
+        for (String state : states) {
+            currentState.add(new Condition(state));
         }
         return currentState;
     }
 
-    public static Stack<SubGoal> initializeGoalStackWith(String[] goalStackArr) {
+    public static Stack<Goal> initializeGoalStackWith(String[] goalStackArr) {
         //put multi part goal on stack
-        Stack<SubGoal> goalStack = new Stack<>();
+        Stack<Goal> goalStack = new Stack<>();
 
         //put single part goals on stack
-        for (int i = 0; i < goalStackArr.length; i++) {
-            goalStack.add(new SubGoal(goalStackArr[i], false, false));
+        for (String s : goalStackArr) {
+            goalStack.add(new Goal(s, false, false));
         }
         return goalStack;
     }
 
     public static LinkedList<Condition> initializeGoalStateWith(String[] goalStackArr) {
         LinkedList<Condition> goalState = new LinkedList<>();
-        for (int i = 0; i < goalStackArr.length; i++) {
-            goalState.add(new Condition(goalStackArr[i]));
+        for (String s : goalStackArr) {
+            goalState.add(new Condition(s));
         }
         return goalState;
     }

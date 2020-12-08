@@ -1,14 +1,16 @@
 package STRIPSAlg;
 
-public class SubGoal {
+public class Goal {
     public String goal;
     public boolean isMultiPartGoal;
     public boolean isAction;
+    public String[] goalParts;
 
-    public SubGoal(String goal, boolean isMultiPartGoal, boolean isAction){
+    public Goal(String goal, boolean isMultiPartGoal, boolean isAction){
         this.goal = goal;
         this.isMultiPartGoal = isMultiPartGoal;
         this.isAction = isAction;
+        goalParts = goal.split(" ");
     }
 
     @Override

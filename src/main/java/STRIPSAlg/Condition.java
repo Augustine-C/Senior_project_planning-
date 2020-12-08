@@ -1,7 +1,5 @@
 package STRIPSAlg;
 
-import java.util.Arrays;
-
 public class Condition {
 
     public String nameOfActionOrState;  // If the Condition records an action, this will be the name of that action

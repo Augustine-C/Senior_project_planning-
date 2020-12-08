@@ -1,56 +1,42 @@
 package utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class InputReader {
 
+    private static List<String> readNames() {
+
+        return new ArrayList<>(Arrays.asList(
+                "Easy Condition",
+                "Do Nothing",
+                "Not Possible",
+                "Paper Example",
+                "Sussman Anomaly"
+        ));
+    }
+
     private static List<String[]> readInitStates() {
-        List<String[]> initialStates = new ArrayList<>();
 
-        String[] doNothingInitialState = {"ON_TABLE(a)", "CLEAR(b)", "ON(b,a)", "ARM_EMPTY"};
-        String[] notPossibleInitialState = {"ON_TABLE(a)", "ON_TABLE(b)", "CLEAR(a)", "ARM_EMPTY"};
-        String[] easyInitialState = {"ON_TABLE(a)", "ON_TABLE(b)", "CLEAR(a)", "CLEAR(b)", "ARM_EMPTY"};
-        String[] paperExampleInitialState = {"ON_TABLE(a)", "ON_TABLE(b)", "ON(c,a)", "CLEAR(b)", "CLEAR(c)", "ARM_EMPTY"};
-        String[] sussmanAnomalyInitialState = {"ON_TABLE(a)", "ON_TABLE(b)", "ON(c,a)", "CLEAR(b)", "CLEAR(c)", "ARM_EMPTY"};
-
-
-        initialStates.add(doNothingInitialState);
-        initialStates.add(notPossibleInitialState);
-        initialStates.add(easyInitialState);
-        initialStates.add(paperExampleInitialState);
-        initialStates.add(sussmanAnomalyInitialState);
-        return initialStates;
+        return new ArrayList<>(Arrays.asList(
+                new String[] {"ON_TABLE(a)", "ON_TABLE(b)", "CLEAR(a)", "CLEAR(b)", "ARM_EMPTY"}, // easyInitialState
+                new String[] {"ON_TABLE(a)", "CLEAR(b)", "ON(b,a)", "ARM_EMPTY"}, // doNothingInitialState
+                new String[] {"ON_TABLE(a)", "ON_TABLE(b)", "CLEAR(a)", "ARM_EMPTY"}, // notPossibleInitialState
+                new String[] {"ON_TABLE(a)", "ON_TABLE(b)", "ON(c,a)", "CLEAR(b)", "CLEAR(c)", "ARM_EMPTY"}, // paperExampleInitialState
+                new String[] {"ON_TABLE(a)", "ON_TABLE(b)", "ON(c,a)", "CLEAR(b)", "CLEAR(c)", "ARM_EMPTY"} // sussmanAnomalyInitialState
+        ));
     }
 
     private static List<String[]> readGoalStates() {
-        List<String[]> goalStates = new ArrayList<>();
 
-        String[] doNothingGoalState = {"ON_TABLE(a)", "CLEAR(b)", "ON(b,a)", "ARM_EMPTY"};
-        String[] notPossibleGoalState = {"ON_TABLE(a)", "CLEAR(b)", "ON(b,a)", "ARM_EMPTY"};
-        String[] easyGoalState = {"ON_TABLE(a)", "CLEAR(b)", "ON(b,a)", "ARM_EMPTY"};
-        String[] paperExampleGoalState = {"ON_TABLE(b)", "CLEAR(a)", "ON(c,b)", "ON(a,c)", "ARM_EMPTY"};
-        String[] sussmanAnomalyGoalState1 = {"ON_TABLE(c)", "CLEAR(a)", "ON(b,c)", "ON(a,b)", "ARM_EMPTY"};
-
-        goalStates.add(doNothingGoalState);
-        goalStates.add(notPossibleGoalState);
-        goalStates.add(easyGoalState);
-        goalStates.add(paperExampleGoalState);
-        goalStates.add(sussmanAnomalyGoalState1);
-        return goalStates;
-    }
-
-
-    private static List<String> readNames() {
-        List<String> names = new ArrayList<>();
-        names.add("Do Nothing");
-        names.add("Not Possible");
-        names.add("Easy Condition");
-        names.add("Paper Example");
-        names.add("Sussman Anomaly");
-
-        return names;
-
+        return new ArrayList<>(Arrays.asList(
+                new String[] {"ON_TABLE(a)", "CLEAR(b)", "ON(b,a)", "ARM_EMPTY"}, // easyGoalState
+                new String[] {"ON_TABLE(a)", "CLEAR(b)", "ON(b,a)", "ARM_EMPTY"}, // doNothingGoalState
+                new String[] {"ON_TABLE(a)", "CLEAR(b)", "ON(b,a)", "ARM_EMPTY"}, // notPossibleGoalState
+                new String[] {"ON_TABLE(b)", "CLEAR(a)", "ON(c,b)", "ON(a,c)", "ARM_EMPTY"}, // paperExampleGoalState
+                new String[] {"ON_TABLE(c)", "CLEAR(a)", "ON(b,c)", "ON(a,b)", "ARM_EMPTY"} // sussmanAnomalyGoalState
+        ));
     }
 
     public static List<String> readNames(String inputFormat){

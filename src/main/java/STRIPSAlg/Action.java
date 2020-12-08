@@ -1,10 +1,12 @@
 package STRIPSAlg;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Action {
 
     public Condition action;
+    public String preconditionString;
     public ArrayList<Condition> preconditions = new ArrayList<>();
     public ArrayList<Condition> results = new ArrayList<>();
 
@@ -13,6 +15,7 @@ public class Action {
         // TODO: undo result is the same as preconditions
         action = new Condition(name);
 
+        preconditionString = preconditions;
         for (String precondition : preconditions.split(" ")){
             this.preconditions.add(new Condition(precondition));
         }
@@ -22,11 +25,24 @@ public class Action {
         }
     }
 
+    public String getName(){
+        return action.nameOfActionOrState;
+    }
+
+    public String getPreconditionString() {
+        // Store the Preconditions for an action in the GoalStack
+        List<String> preconditionList = new ArrayList<>();
+        for (Condition precondition : preconditions) {
+            preconditionList.add(precondition.toString());
+        }
+        return String.join(" ", preconditionList);
+    }
+
     public boolean isGoalAchieved(String goal) {
         boolean goalAchieved = false;
 
-        for (int i = 0; i < results.size(); i++) {
-            if(results.get(i).nameOfActionOrState.equalsIgnoreCase(goal)){
+        for (Condition result : results) {
+            if (result.nameOfActionOrState.equalsIgnoreCase(goal)) {
                 goalAchieved = true;
                 break;
             }

@@ -1,19 +1,20 @@
 package utils;
 
+import STRIPSAlg.Action;
+import utils.Enums.OutputFormat;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ResultWriter {
-    public enum OutputFormat {
-        TXT,
-        PRINT_ONLY,
-    }
 
-    public static void writeResult(List<String> plan, String name, String[] initialStates, String[] goalStates, OutputFormat outputFileFormat){
+    public static void writeResult(List<Action> plan, String name, String[] initialStates, String[] goalStates, OutputFormat outputFileFormat){
         switch (outputFileFormat){
             case PRINT_ONLY:
                 System.out.println();
                 System.out.println("--------------------------");
-                System.out.println(String.format("*******%s*******", name));
+                System.out.printf("*******%s*******%n", name);
                 System.out.println("--------------------------");
                 System.out.println("|     Initial State      |");
                 System.out.println("--------------------------");
@@ -29,7 +30,7 @@ public class ResultWriter {
                 System.out.println("--------------------------");
                 System.out.println("|    Plan of Actions     |");
                 System.out.println("--------------------------");
-                System.out.println(String.join("\n", plan));
+                System.out.println(planToString(plan));
                 System.out.println("--------------------------");
                 System.out.println();
                 break;
@@ -39,6 +40,22 @@ public class ResultWriter {
                 break;
 
         }
+    }
+
+    private static String planToString(List<Action> plan){
+        StringBuilder output = new StringBuilder();
+        if (plan.isEmpty()){
+            return output.toString();
+        }
+        for(Action action : plan){
+            output.append(action.action.toString()).append("\n");
+        }
+        return output.substring(0, output.length()-1);
+    }
+
+    public static void writeStringResult(String result, String name, String[] initialStates, String[] goalStates, OutputFormat outputFileFormat){
+        Action UnsolvableAction = new Action(result, "", "");
+        writeResult(new ArrayList<>(Collections.singletonList(UnsolvableAction)), name, initialStates, goalStates, outputFileFormat);
     }
 
 }
