@@ -2,6 +2,7 @@ package STRIPSAlg;
 
 import utils.*;
 import utils.Exceptions.*;
+import utils.Enums.GoalType;
 
 import java.util.*;
 
@@ -60,13 +61,12 @@ public class STRIPS {
     public void attemptNextGoal() throws UnsolvableException {
         Goal nextGoal = goalStack.peek();
 
-
-        if (nextGoal.isAction) {
+        if (nextGoal.goalType == GoalType.Action) {
             doAction(nextGoal);
         }
         else if (isGoalFullyAchieved(nextGoal)) { // It is either a single part goal or a multi part goal
                 goalStack.pop();
-        } else if (nextGoal.isMultiPartGoal) {
+        } else if (nextGoal.goalType == GoalType.MultiPartGoal) {
             planMultiPartGoal(nextGoal);
         } else { // The goal is single part goal
             planSinglePartGoal(nextGoal);
@@ -92,6 +92,10 @@ public class STRIPS {
         }
     }
 
+    /**
+     * This method will update the currentState after an action is performed
+     * @param newAction
+     */
     private void updateCurrentState(Action newAction) {
         for (int i = 0; i < newAction.preconditions.size(); i++) {
             for (int j = 0; j < this.currentState.size(); j++) {
@@ -143,28 +147,40 @@ public class STRIPS {
         }
     }
 
+    /**
+     * This method will help us plan the Goal with multiple parts
+     * @param goal
+     */
     private void planMultiPartGoal(Goal goal) {
-
-        for (String goalPartNeedToDo : goal.goalParts){
+        for (String goalPartNeedToDo : goal.getGoalParts()){
             // If not all goals are achieved, we will store all parts of goals on Goal Stack
             // Each part of the goal is a single part goal
-            goalStack.push(new Goal(goalPartNeedToDo, false, false));
+            goalStack.push(new Goal(goalPartNeedToDo, GoalType.SinglePartGoal));
         }
-
     }
 
+    /**
+     * This method will help us plan the Single Part Goal
+     * @param goal
+     * @throws UnsolvableException
+     */
     private void planSinglePartGoal(Goal goal) throws UnsolvableException {
 
         // If we did not achieved the sub goal, we will find the best actions to achieve it.
         // After that, we will store it in the stack
-        Action clone = findBestAction(new Condition(goal.goal));
+        Action clone = findBestAction(goal);
         plan.add(clone);
         pushPreconditionsToGoalStack(clone);
     }
 
+    /**
+     * This method can help us check whether a goal has been achieved under current state
+     * @param goal
+     * @return
+     */
     private boolean isGoalFullyAchieved(Goal goal){
-        if (goal.isMultiPartGoal){
-            String[] multiPartGoals = goal.goalParts;
+        if (goal.goalType == GoalType.MultiPartGoal){
+            String[] multiPartGoals = goal.getGoalParts();
             boolean goalNotFullyAchieved = true;
 
             for (String goalPart : multiPartGoals){
@@ -179,7 +195,7 @@ public class STRIPS {
                     for (String goalPartNeedToDo : multiPartGoals){
                         // If not all goals are achieved, we will store all parts of goals on Goal Stack
                         // Each part of the goal is a single part goal
-                        goalStack.push(new Goal(goalPartNeedToDo, false, false));
+                        goalStack.push(new Goal(goalPartNeedToDo, GoalType.SinglePartGoal));
                     }
                     break;
                 }
@@ -199,31 +215,41 @@ public class STRIPS {
         }
     }
 
+    /**
+     * This method will push the preconditions of the given action to goal stack
+     * @param action
+     */
     private void pushPreconditionsToGoalStack(Action action) {
         // Store the Action in the GoalStack
-        this.goalStack.push(new Goal(action.action.toString(), false, true));
+        this.goalStack.push(new Goal(action.action.toString(), GoalType.Action));
 
         // Store the multi part goals in the GoalStack
-        this.goalStack.push(new Goal(action.getPreconditionString(), true, false));
+        this.goalStack.push(new Goal(action.getPreconditionString(), GoalType.MultiPartGoal));
 
         // Store the single part goals in the GoalStack
         for (Condition precondition : action.preconditions) {
-            goalStack.push(new Goal(precondition.toString(), false, false));
+            goalStack.push(new Goal(precondition.toString(), GoalType.SinglePartGoal));
         }
     }
 
-    private Action findBestAction(Condition goal) throws UnsolvableException {
+    /**
+     * This is the Heuristic method that help us get the best action for the given state that we want to achieve
+     * @param goal
+     * @return
+     * @throws UnsolvableException
+     */
+    private Action findBestAction(Goal goal) throws UnsolvableException {
         // Heuristic
 
         Action currentAction = null;
 
         String[] items = new String[2];
 
-        if (goal.nameOfActionOrState.equalsIgnoreCase("HOLDING")) {
+        if (goal.getNameOfGoal().equalsIgnoreCase("HOLDING")) {
             // If we want to HOLDING an item, there are two actions we can take: UNSTACK or PICK_UP
             for (Condition condition : currentState) {
                 if (condition.nameOfActionOrState.equalsIgnoreCase("ON")
-                        && condition.items[0].equalsIgnoreCase(goal.items[0])) {
+                        && condition.items[0].equalsIgnoreCase(goal.getItems()[0])) {
                     currentAction = getAction("UNSTACK");
 
                     items[0] = condition.items[0];
@@ -233,18 +259,18 @@ public class STRIPS {
             if (currentAction == null) {
                 currentAction = getAction("PICK_UP");
 
-                items[0] = goal.items[0];
+                items[0] = goal.getItems()[0];
             }
-        } else if (goal.nameOfActionOrState.equalsIgnoreCase("ARM_EMPTY")) {
+        } else if (goal.getNameOfGoal().equalsIgnoreCase("ARM_EMPTY")) {
             // If we want to get our ARM_EMPTY, there are two actions we can take: STACK or PUT_DOWN
             // We will use the cloneActionHelper to determine which one is the best
             currentAction = findBestActionHelper(items);
-        } else if (goal.nameOfActionOrState.equalsIgnoreCase("CLEAR")) {
+        } else if (goal.getNameOfGoal().equalsIgnoreCase("CLEAR")) {
             // If we want to get an item CLEAR, there are three actions we can take: STACK, UNSTACK, or PUT_DOWN
             boolean isHoldingItem = false;
             for (Condition condition : currentState) {
                 if (condition.nameOfActionOrState.equalsIgnoreCase("HOLDING")
-                        && condition.items[0].equalsIgnoreCase(goal.items[0])) {
+                        && condition.items[0].equalsIgnoreCase(goal.getItems()[0])) {
                     isHoldingItem = true;
                     break;
                 }
@@ -258,7 +284,7 @@ public class STRIPS {
                 // If we are not HOLDING any item. Alternatively, we have our ARM_EMPTY
                 for (Condition condition : currentState) {
                     if (condition.nameOfActionOrState.equalsIgnoreCase("ON")
-                            && condition.items[1].equalsIgnoreCase(goal.items[0])) {
+                            && condition.items[1].equalsIgnoreCase(goal.getItems()[0])) {
                         currentAction = getAction("UNSTACK");
 
                         items[0] = condition.items[0];
@@ -271,10 +297,10 @@ public class STRIPS {
         } else {
             // If we are not working on StateDescriptions, we will do an Action
             for(Action action : allActions){
-                if (action.isGoalAchieved(goal.nameOfActionOrState)) {
+                if (action.isGoalAchieved(goal.getNameOfGoal())) {
                     currentAction = getAction(action.getName());
 
-                    System.arraycopy(goal.items, 0, items, 0, goal.items.length);
+                    System.arraycopy(goal.getItems(), 0, items, 0, goal.getItems().length);
                     break;
                 }
             }
@@ -292,7 +318,11 @@ public class STRIPS {
         return currentAction;
     }
 
-    // Deal with the case when we need to achieve ARM_EMPTY or HOLDING
+    /**
+     * This method will deal with the case when we need to achieve ARM_EMPTY or HOLDING goal
+     * @param items
+     * @return
+     */
     private Action findBestActionHelper(String[] items) {
         Action action = null;
         for (Condition condition : goalState) {
@@ -320,6 +350,11 @@ public class STRIPS {
         return action;
     }
 
+    /**
+     * Get a clone of the action from the allAction list
+     * @param actionName the name of the action we want
+     * @return a clone of the action with given action name from the allAction list
+     */
     private Action getAction(String actionName) {
         for (Action allAction : allActions) {
             if (allAction.action.nameOfActionOrState.equalsIgnoreCase(actionName)) {

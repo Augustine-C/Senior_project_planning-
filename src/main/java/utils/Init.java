@@ -6,6 +6,7 @@ import STRIPSAlg.Goal;
 
 import java.util.LinkedList;
 import java.util.Stack;
+import utils.Enums.GoalType;
 
 public class Init {
 
@@ -41,7 +42,7 @@ public class Init {
 
         //put single part goals on stack
         for (String s : goalStackArr) {
-            goalStack.add(new Goal(s, false, false));
+            goalStack.add(new Goal(s, GoalType.SinglePartGoal));
         }
         return goalStack;
     }
