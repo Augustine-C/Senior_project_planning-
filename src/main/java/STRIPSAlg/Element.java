@@ -10,9 +10,7 @@ public class Element {
                                         // Otherwise, it will record the name of the State Description
                                         // Example: "HOLDING", "ON_TABLE", "ON", "ARM_EMPTY"
 
-    public Element() {
-        
-    }
+    public Element() {}
 
     public void setElementType(ElementType elementType) {
         this.elementType = elementType;

@@ -7,7 +7,6 @@ import STRIPSAlg.Element;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Stack;
-import utils.Enums.ElementType;
 
 public class Init {
 
