@@ -1,40 +1,44 @@
 package STRIPSAlg;
 
-public class Condition {
+import utils.Enums.ElementType;
 
-    public String nameOfActionOrState;  // If the Condition records an action, this will be the name of that action
-                                        // Example: "PICK_UP", "STACK", "UNSTACK", "PUT_DOWN"
-                                        // Otherwise, it will record the name of the State Description
-                                        // Example: "HOLDING", "ON_TABLE", "ON", "ARM_EMPTY"
-    public String[] items;
+public class Condition extends Element {
+
+//    public String nameOfActionOrState;  // If the Condition records an action, this will be the name of that action
+//                                        // Example: "PICK_UP", "STACK", "UNSTACK", "PUT_DOWN"
+//                                        // Otherwise, it will record the name of the State Description
+//                                        // Example: "HOLDING", "ON_TABLE", "ON", "ARM_EMPTY"
+//    public String multiConString;
+    private String[] conditions;
 
     public Condition(String stateString) { // ON(C,B)
-        int openBracket = stateString.indexOf('(');
-        int closeBracket = stateString.indexOf(')');
+        super();
+        conditions = stateString.split(" ");
 
-        if (openBracket != -1) {
-            nameOfActionOrState = stateString.substring(0, openBracket);
-            items = stateString.substring(openBracket + 1, closeBracket).split(",");
-        } else {
-            nameOfActionOrState = stateString;
+        if (conditions.length > 1) { // Multi Part
+//            this.multiConString = stateString;
+            super.setElementType(ElementType.MultiPartGoal);
         }
+        else if (conditions.length == 1){
+            super.parseStateString(stateString);
+            super.setElementType(ElementType.SinglePartGoal);
+        } else {
+            throw new IllegalStateException("[Condition Initializer] ");
+        }
+    }
+
+    public String[] getConditions() {
+        return conditions;
     }
 
     @Override
     public String toString() {
-        String stateDescString = nameOfActionOrState;
-
-        if (items != null) {
-            stateDescString += "(";
-            stateDescString += String.join(",", items);
-            stateDescString += ")";
+        if (super.elementType == ElementType.MultiPartGoal){
+            return String.join(" ", conditions);
+        } else {
+            return super.toString();
         }
-
-        return stateDescString;
     }
 
-    @Override
-    public boolean equals(Object element){
-        return this.toString().equalsIgnoreCase(element.toString());
-    }
+
 }

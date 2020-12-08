@@ -2,11 +2,12 @@ package utils;
 
 import STRIPSAlg.Action;
 import STRIPSAlg.Condition;
-import STRIPSAlg.Goal;
+import STRIPSAlg.Element;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Stack;
-import utils.Enums.GoalType;
+import utils.Enums.ElementType;
 
 public class Init {
 
@@ -28,27 +29,27 @@ public class Init {
         return allActions;
     }
 
-    public static LinkedList<Condition> initializeCurrentStateWith(String[] states) {
-        LinkedList<Condition> currentState = new LinkedList<>();
+    public static HashSet<Condition> initializeCurrentStateWith(String[] states) {
+        HashSet<Condition> currentState = new HashSet<>();
         for (String state : states) {
             currentState.add(new Condition(state));
         }
         return currentState;
     }
 
-    public static Stack<Goal> initializeGoalStackWith(String[] goalStackArr) {
+    public static Stack<Element> initializeGoalStackWith(String[] goalStackArr) {
         //put multi part goal on stack
-        Stack<Goal> goalStack = new Stack<>();
+        Stack<Element> elementStack = new Stack<>();
 
         //put single part goals on stack
         for (String s : goalStackArr) {
-            goalStack.add(new Goal(s, GoalType.SinglePartGoal));
+            elementStack.add(new Condition(s));
         }
-        return goalStack;
+        return elementStack;
     }
 
-    public static LinkedList<Condition> initializeGoalStateWith(String[] goalStackArr) {
-        LinkedList<Condition> goalState = new LinkedList<>();
+    public static HashSet<Condition> initializeGoalStateWith(String[] goalStackArr) {
+        HashSet<Condition> goalState = new HashSet<>();
         for (String s : goalStackArr) {
             goalState.add(new Condition(s));
         }

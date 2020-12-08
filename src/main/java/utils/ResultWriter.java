@@ -44,11 +44,8 @@ public class ResultWriter {
 
     private static String planToString(List<Action> plan){
         StringBuilder output = new StringBuilder();
-        if (plan.isEmpty()){
-            return output.toString();
-        }
         for(Action action : plan){
-            output.append(action.action.toString()).append("\n");
+            output.append(action.getOutputString()).append("\n");
         }
         return output.substring(0, output.length()-1);
     }

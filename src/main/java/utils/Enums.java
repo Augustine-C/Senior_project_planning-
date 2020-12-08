@@ -5,7 +5,7 @@ public class Enums {
         TXT,
         PRINT_ONLY,
     }
-    public enum GoalType {
+    public enum ElementType {
         Action,
         MultiPartGoal,
         SinglePartGoal

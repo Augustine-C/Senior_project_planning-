@@ -1,19 +1,21 @@
 package STRIPSAlg;
 
+import utils.Enums.ElementType;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Action {
+public class Action extends Element {
 
-    public Condition action;
     public String preconditionString;
     public ArrayList<Condition> preconditions = new ArrayList<>();
     public ArrayList<Condition> results = new ArrayList<>();
 
 
     public Action(String name, String preconditions, String results) {
-        // TODO: undo result is the same as preconditions
-        action = new Condition(name);
+        super();
+        parseStateString(name);
+        setElementType(ElementType.Action);
 
         preconditionString = preconditions;
         for (String precondition : preconditions.split(" ")){
@@ -26,7 +28,7 @@ public class Action {
     }
 
     public String getName(){
-        return action.nameOfActionOrState;
+        return nameOfActionOrState;
     }
 
     public String getPreconditionString() {
@@ -64,15 +66,19 @@ public class Action {
         }
 
         return new Action(
-                action.toString(),
+                super.toString(),
                 String.join(" ", preconditionsStringList),
                 String.join(" ", resultsStringList)
         );
     }
 
+    public String getOutputString(){
+        return super.toString();
+    }
+
     @Override
     public String toString() {
-        return ("action: " + action
+        return ("action: " + super.toString()
                 + "\n  preconditions: " + preconditions
                 + "\n  results:          " + results);
     }
