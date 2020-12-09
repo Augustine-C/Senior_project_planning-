@@ -1,6 +1,5 @@
 # Project Specific
-JSONOutput/
-JSONOutput_BAK/
+ResultOutput/
 
 # VS Code
 .vscode/
