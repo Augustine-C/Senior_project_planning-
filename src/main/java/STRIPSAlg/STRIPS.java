@@ -227,13 +227,7 @@ public class STRIPS {
         this.goalStack.push(action);
 
         // Store the multi part goals in the GoalStack
-        // TODO: Why do we push the multi part goal into goal stack
         this.goalStack.push(new Condition(action.getPreconditionString()));
-
-        // Store the single part goals in the GoalStack
-        for (Condition precondition : action.preconditions) {
-            goalStack.push(new Condition(precondition.toString()));
-        }
     }
 
     /**
