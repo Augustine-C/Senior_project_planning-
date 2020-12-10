@@ -13,7 +13,7 @@ import java.util.List;
 public class Main {
 
     final static Boolean PRINT_GOAL_STACK = false;
-    final static OutputFormat OUTPUT_FORMAT = OutputFormat.PRINT_ONLY;
+    final static OutputFormat OUTPUT_FORMAT = OutputFormat.JSON;
 
     public static void main(String[] args) {
         List<String> names = InputReader.readNames("");
