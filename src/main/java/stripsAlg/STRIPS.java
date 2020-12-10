@@ -83,10 +83,11 @@ public class STRIPS {
         if (nextElement.elementType == ElementType.ACTION) {
             plan.add((Action) nextElement);
             doAction(nextElement);
-        } else if (isConditionFullyAchieved((Condition) nextElement)) { // It is either a single part goal or a multi part goal
+        } else if (isConditionFullyAchieved(nextElement)) { // It is either a single part goal or a multi part goal
             goalStack.pop();
         } else if (nextElement.elementType == ElementType.MULTI_PART_CONDITION) {
-            planMultiPartCondition((Condition) nextElement);
+            // Multi-con
+            planMultiPartCondition((MultiCondition) nextElement);
         } else if (nextElement.elementType == ElementType.SINGLE_PART_CONDITION) { // The goal is single part goal
             planSinglePartCondition((Condition) nextElement);
         } else {
@@ -188,11 +189,11 @@ public class STRIPS {
      *
      * @param condition this is the element of goal stack that describes a multi part goal that we want to plan
      */
-    private void planMultiPartCondition(Condition condition) {
-        for (String goalPartNeedToDo : condition.getConditions()) {
+    private void planMultiPartCondition(MultiCondition condition) {
+        for (Condition goalPartNeedToDo : condition.getConditions()) {
             // If not all goals are achieved, we will store all parts of goals on Goal Stack
             // Each part of the goal is a single part goal
-            goalStack.push(new Condition(goalPartNeedToDo));
+            goalStack.push(goalPartNeedToDo);
         }
     }
 
@@ -216,24 +217,24 @@ public class STRIPS {
      * @param condition this is the condition we want to check about whether it has been achieved
      * @return it will return a Boolean value that true means the input is achieved, otherwise false.
      */
-    private boolean isConditionFullyAchieved(Condition condition) {
+    private boolean isConditionFullyAchieved(Element condition) {
         if (condition.elementType == ElementType.MULTI_PART_CONDITION) {
-            String[] multiPartGoals = condition.getConditions();
+            ArrayList<Condition> multiPartGoals = ((MultiCondition)condition).getConditions();
             boolean conditionNotFullyAchieved = true;
 
-            for (String goalPart : multiPartGoals) {
+            for (Condition goalPart : multiPartGoals) {
                 conditionNotFullyAchieved = true;
                 for (Condition statePart : currentState) {
-                    if (goalPart.equalsIgnoreCase(statePart.toString())) {
+                    if (goalPart.equals(statePart)) {
                         conditionNotFullyAchieved = false;
                         break;
                     }
                 }
                 if (conditionNotFullyAchieved) {
-                    for (String goalPartNeedToDo : multiPartGoals) {
+                    for (Condition goalPartNeedToDo : multiPartGoals) {
                         // If not all goals are achieved, we will store all parts of goals on Goal Stack
                         // Each part of the goal is a single part goal
-                        goalStack.push(new Condition(goalPartNeedToDo));
+                        goalStack.push(goalPartNeedToDo);
                     }
                     break;
                 }
@@ -265,7 +266,8 @@ public class STRIPS {
         this.goalStack.push(action);
 
         // Store the multi part goals in the GoalStack
-        this.goalStack.push(new Condition(action.getPreconditionString()));
+        // Multi-con
+        this.goalStack.push(new MultiCondition(action.getPreconditionString()));
     }
 
     /**

@@ -206,7 +206,8 @@ public class ResultWriter {
         }
         boolean deleteResult = directoryToBeDeleted.delete();
         if (!deleteResult) {
-            throw new IOException("[ResultWriter.deleteDirectory] Failed to delete given directory: " + directoryToBeDeleted.getAbsolutePath());
+            // throw new IOException("[ResultWriter.deleteDirectory] Failed to delete given directory: " + directoryToBeDeleted.getAbsolutePath());
+            // TODO: 
         }
     }
 }
