@@ -9,13 +9,12 @@ import java.util.*;
 
 public class StuckDetector {
 
-    private static int objectCount;
     private static int CYCLE_THRESHOLD;
     private final LinkedList<String[]> goalStackLog = new LinkedList<>();
 
     public StuckDetector(HashSet<Condition> state){
-        this.objectCount = getNumberOfObjects(state);
-        CYCLE_THRESHOLD = objectCount * objectCount;
+        int objectCount = getNumberOfObjects(state);
+        CYCLE_THRESHOLD = objectCount * objectCount * objectCount;
     }
 
     private int getNumberOfObjects(HashSet<Condition> state) {
