@@ -15,8 +15,7 @@ public class STRIPS {
     private final List<Action> plan; // The action plan in Action type
     private final boolean printGoalStack; // This is an indicator on whether debugging information about goal stack needs to be printed, true for printing the goal stack, otherwise false
     private int whileLoopCount = 0; // This is the counter for while loop in step(). This is used for debugging purposes
-    private final StuckDetector stuckDetector = new StuckDetector(); // This is the stuck detector that helps us determine whether STRIPS planner is stuck.
-
+    private final StuckDetector stuckDetector; // This is the stuck detector that helps us determine whether STRIPS planner is stuck.
     /**
      * This is where the planning works get done
      *
@@ -39,6 +38,7 @@ public class STRIPS {
         this.goalState = Init.initializeStateWith(goalStateArr);
         this.goalStack = Init.initializeGoalStackWith(goalStateArr);
         this.printGoalStack = printGoalStack;
+        stuckDetector = new StuckDetector(this.goalState);
     }
 
     /**
@@ -57,7 +57,7 @@ public class STRIPS {
         }
 
         while (!goalStack.empty()) {
-            stuckDetector.logGoalStack(goalStack.toString().split(","));
+            stuckDetector.logGoalStack(goalStack);
             if (stuckDetector.detectCycle()) {
                 throw new StuckException();
             }
@@ -95,7 +95,7 @@ public class STRIPS {
 
         if (printGoalStack) {
             System.out.printf("While Loop Count: %d%n", whileLoopCount);
-            System.out.println(goalStack);
+            System.out.println(Arrays.asList(StuckDetector.getGoalStackStringArr(goalStack)));
             whileLoopCount++;
         }
     }

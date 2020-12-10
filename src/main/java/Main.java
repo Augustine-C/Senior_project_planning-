@@ -36,6 +36,7 @@ public class Main {
             } catch (CompleteAtStartException e) {
                 resultWriter.writeStringResult("NOTHING_NEEDS_TO_BE_DONE", name, initialState, goalState, PlannerState.DO_NOTHING);
             }
+            System.out.printf("%s completed\n", name);
         }
 
     }

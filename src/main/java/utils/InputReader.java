@@ -12,7 +12,8 @@ public class InputReader {
                 "Do Nothing",
                 "Not Possible",
                 "Paper Example",
-                "Sussman Anomaly"
+                "Sussman Anomaly",
+                "New Condition"
         ));
     }
 
@@ -22,7 +23,8 @@ public class InputReader {
                 new String[]{"ON_TABLE(a)", "CLEAR(b)", "ON(b,a)", "ARM_EMPTY"}, // doNothingInitialState
                 new String[]{"ON_TABLE(a)", "ON_TABLE(b)", "CLEAR(a)", "ARM_EMPTY"}, // notPossibleInitialState
                 new String[]{"ON_TABLE(a)", "ON_TABLE(b)", "ON(c,a)", "CLEAR(b)", "CLEAR(c)", "ARM_EMPTY"}, // paperExampleInitialState
-                new String[]{"ON_TABLE(a)", "ON_TABLE(b)", "ON(c,a)", "CLEAR(b)", "CLEAR(c)", "ARM_EMPTY"} // sussmanAnomalyInitialState
+                new String[]{"ON_TABLE(a)", "ON_TABLE(b)", "ON(c,a)", "CLEAR(b)", "CLEAR(c)", "ARM_EMPTY"}, // sussmanAnomalyInitialState
+                new String[]{"ON_TABLE(a)", "ON_TABLE(b)", "ON_TABLE(c)", "ON(e,c)", "ON(d,b)", "ON(f,a)", "CLEAR(e)", "CLEAR(f)", "CLEAR(d)", "ARM_EMPTY"}
         ));
     }
 
@@ -33,7 +35,8 @@ public class InputReader {
                 new String[]{"ON_TABLE(a)", "CLEAR(b)", "ON(b,a)", "ARM_EMPTY"}, // doNothingGoalState
                 new String[]{"ON_TABLE(a)", "CLEAR(b)", "ON(b,a)", "ARM_EMPTY"}, // notPossibleGoalState
                 new String[]{"ON_TABLE(b)", "CLEAR(a)", "ON(c,b)", "ON(a,c)", "ARM_EMPTY"}, // paperExampleGoalState
-                new String[]{"ON_TABLE(c)", "CLEAR(a)", "ON(b,c)", "ON(a,b)", "ARM_EMPTY"} // sussmanAnomalyGoalState
+                new String[]{"ON_TABLE(c)", "CLEAR(a)", "ON(b,c)", "ON(a,b)", "ARM_EMPTY"}, // sussmanAnomalyGoalState
+                new String[]{"CLEAR(b)", "ON(b,d)", "ON(d,c)", "ON(c,e)", "ON(e,f)", "ON(f,a)", "ON_TABLE(a)", "ARM_EMPTY"}
         ));
     }
 
