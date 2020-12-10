@@ -1,10 +1,10 @@
 package utils;
 
-import STRIPSAlg.Action;
+import stripsAlg.Action;
 import org.json.JSONObject;
 import org.json.XML;
-import utils.Enums.OutputFormat;
-import utils.Enums.ActionPlanState;
+import utils.enums.PlannerState;
+import utils.enums.OutputFormat;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -26,19 +26,16 @@ public class ResultWriter {
         this.outputFormat = outputFormat;
     }
 
-    public void writeStringResult(String result, String name, String[] initialStates, String[] goalStates, ActionPlanState actionPlanState) {
+    public void writeStringResult(String result, String name, String[] initialStates, String[] goalStates, PlannerState plannerState) {
         Action UnsolvableAction = new Action(result, "", "");
-        writeResult(new ArrayList<>(Collections.singletonList(UnsolvableAction)), name, initialStates, goalStates, actionPlanState);
+        writeResult(new ArrayList<>(Collections.singletonList(UnsolvableAction)), name, initialStates, goalStates, plannerState);
     }
 
-    public void writeResult(List<Action> plan, String name, String[] initialStates, String[] goalStates, ActionPlanState actionPlanState) {
-        switch (outputFormat) {
-            case PRINT_ONLY:
-                writePrintOnly(plan, name, initialStates, goalStates);
-                break;
-            default:
-                writeFile(plan, name, initialStates, goalStates, actionPlanState, outputFormat);
-                break;
+    public void writeResult(List<Action> plan, String name, String[] initialStates, String[] goalStates, PlannerState plannerState) {
+        if (outputFormat == OutputFormat.PRINT_ONLY) {
+            writePrintOnly(plan, name, initialStates, goalStates);
+        } else {
+            writeFile(plan, name, initialStates, goalStates, plannerState, outputFormat);
         }
     }
 
@@ -70,7 +67,7 @@ public class ResultWriter {
         return String.join("\n", planToStringArr(plan));
     }
 
-    private void writeFile(List<Action> plan, String name, String[] initialStates, String[] goalStates, ActionPlanState actionPlanState, OutputFormat outputFormat) {
+    private void writeFile(List<Action> plan, String name, String[] initialStates, String[] goalStates, PlannerState plannerState, OutputFormat outputFormat) {
         String filePath = FOLDER_PATH + FILE_NAME + "_" + name.replace(" ", "_");
         try {
             File directory = new File(FOLDER_PATH);
@@ -80,20 +77,23 @@ public class ResultWriter {
                 isFirstOutput = false;
             }
             if (!directory.exists()) {
-                directory.mkdir();
+                boolean mkdirResult = directory.mkdir();
+                if (!mkdirResult) {
+                    throw new IOException("[ResultWriter.writeFile] Failed to create a new directory: " + directory.getAbsolutePath());
+                }
             }
             switch (outputFormat) {
                 case JSON:
                     fileWriter = new FileWriter(filePath + ".json");
-                    fileWriter.write(getJSONOutput(plan, name, initialStates, goalStates, actionPlanState).toString(2));
+                    fileWriter.write(getJSONOutput(plan, name, initialStates, goalStates, plannerState).toString(2));
                     break;
                 case TXT:
                     fileWriter = new FileWriter(filePath + ".txt");
-                    fileWriter.write(getTXTOutput(plan, name, initialStates, goalStates, actionPlanState));
+                    fileWriter.write(getTXTOutput(plan, name, initialStates, goalStates));
                     break;
                 case XML:
                     fileWriter = new FileWriter(filePath + ".xml");
-                    fileWriter.write(getXMLOutput(plan, name, initialStates, goalStates, actionPlanState));
+                    fileWriter.write(getXMLOutput(plan, name, initialStates, goalStates, plannerState));
                     break;
                 default:
                     throw new UnsupportedOperationException("Output in this file type is not supported yet!");
@@ -111,12 +111,12 @@ public class ResultWriter {
         }
     }
 
-    private String getXMLOutput(List<Action> plan, String name, String[] initialStates, String[] goalStates, ActionPlanState actionPlanState) {
-        JSONObject jsonObject = getJSONOutput(plan, name, initialStates, goalStates, actionPlanState);
+    private String getXMLOutput(List<Action> plan, String name, String[] initialStates, String[] goalStates, PlannerState plannerState) {
+        JSONObject jsonObject = getJSONOutput(plan, name, initialStates, goalStates, plannerState);
         return XML.toString(jsonObject);
     }
 
-    private String getTXTOutput(List<Action> plan, String name, String[] initialStates, String[] goalStates, ActionPlanState actionPlanState) {
+    private String getTXTOutput(List<Action> plan, String name, String[] initialStates, String[] goalStates) {
         System.out.println();
 
         System.out.println();
@@ -126,15 +126,11 @@ public class ResultWriter {
         stringList.add("--------------------------");
         stringList.add("|     Initial State      |");
         stringList.add("--------------------------");
-        for (String initialState : initialStates) {
-            stringList.add(initialState);
-        }
+        stringList.addAll(Arrays.asList(initialStates));
         stringList.add("--------------------------");
         stringList.add("|       Goal State       |");
         stringList.add("--------------------------");
-        for (String goalState : goalStates) {
-            stringList.add(goalState);
-        }
+        stringList.addAll(Arrays.asList(goalStates));
         stringList.add("--------------------------");
         stringList.add("|    Plan of Actions     |");
         stringList.add("--------------------------");
@@ -143,14 +139,14 @@ public class ResultWriter {
         return String.join("\n", stringList);
     }
 
-    private JSONObject getJSONOutput(List<Action> plan, String name, String[] initialStates, String[] goalStates, ActionPlanState actionPlanState) {
+    private JSONObject getJSONOutput(List<Action> plan, String name, String[] initialStates, String[] goalStates, PlannerState plannerState) {
         JSONObject actionPlanJSON = new JSONObject();
         actionPlanJSON.put("name", name);
         actionPlanJSON.put("initialState", Arrays.asList(initialStates));
         actionPlanJSON.put("goalState", Arrays.asList(goalStates));
 
         JSONObject actionPlanStateJSON = new JSONObject();
-        switch (actionPlanState) {
+        switch (plannerState) {
             case NORMAL:
                 actionPlanJSON.put("plan", planToStringArr(plan));
                 actionPlanStateJSON.put("unsolvable", false);
@@ -201,13 +197,16 @@ public class ResultWriter {
      *
      * @param directoryToBeDeleted the directory and all files under it to be removed
      */
-    private static void deleteDirectory(File directoryToBeDeleted) {
+    private static void deleteDirectory(File directoryToBeDeleted) throws IOException {
         File[] allContents = directoryToBeDeleted.listFiles();
         if (allContents != null) {
             for (File file : allContents) {
                 deleteDirectory(file);
             }
         }
-        directoryToBeDeleted.delete();
+        boolean deleteResult = directoryToBeDeleted.delete();
+        if (!deleteResult) {
+            throw new IOException("[ResultWriter.deleteDirectory] Failed to delete given directory: " + directoryToBeDeleted.getAbsolutePath());
+        }
     }
 }

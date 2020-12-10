@@ -1,23 +1,21 @@
-package STRIPSAlg;
+package stripsAlg;
 
-import utils.Enums.ElementType;
+import utils.enums.ElementType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Action extends Element {
 
-    public String preconditionString;
-    public ArrayList<Condition> preconditions = new ArrayList<>();
-    public ArrayList<Condition> results = new ArrayList<>();
+    public final ArrayList<Condition> preconditions = new ArrayList<>();
+    public final ArrayList<Condition> results = new ArrayList<>();
 
 
     public Action(String name, String preconditions, String results) {
         super();
         parseStateString(name);
-        setElementType(ElementType.Action);
+        setElementType(ElementType.ACTION);
 
-        preconditionString = preconditions;
         for (String precondition : preconditions.split(" ")){
             this.preconditions.add(new Condition(precondition));
         }
@@ -55,6 +53,11 @@ public class Action extends Element {
 
     @Override
     public Action clone() {
+        try {
+            super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
         ArrayList<String> preconditionsStringList = new ArrayList<>();
         for (Condition precondition : this.preconditions){
             preconditionsStringList.add(precondition.toString());

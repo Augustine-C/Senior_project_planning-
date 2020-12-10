@@ -1,11 +1,12 @@
-import STRIPSAlg.Action;
-import STRIPSAlg.STRIPS;
+import stripsAlg.Action;
+import stripsAlg.STRIPS;
 import utils.*;
-import utils.Exceptions.CompleteAtStartException;
-import utils.Exceptions.StuckException;
-import utils.Exceptions.UnsolvableException;
-import utils.Enums.OutputFormat;
-import utils.Enums.ActionPlanState;
+import utils.enums.PlannerState;
+import utils.enums.OutputFormat;
+import utils.exceptions.CompleteAtStartException;
+import utils.exceptions.StuckException;
+import utils.exceptions.UnsolvableException;
+
 
 import java.util.List;
 
@@ -20,20 +21,20 @@ public class Main {
         List<String[]> goalStates = InputReader.readGoalStates("");
         ResultWriter resultWriter = new ResultWriter(OUTPUT_FORMAT);
 
-        for (int i = 0; i < names.size(); i++){
+        for (int i = 0; i < names.size(); i++) {
             String name = names.get(i);
             String[] initialState = initialStates.get(i);
             String[] goalState = goalStates.get(i);
             try {
                 STRIPS strips = new STRIPS(initialState, goalState, PRINT_GOAL_STACK);
                 List<Action> plan = strips.getPlan();
-                resultWriter.writeResult(plan, name, initialState, goalState, ActionPlanState.NORMAL);
-            } catch (UnsolvableException e){
-                resultWriter.writeStringResult("UNSOLVABLE", name, initialState, goalState, ActionPlanState.UNSOLVABLE);
-            } catch (StuckException e){
-                resultWriter.writeStringResult("STRIPS_STUCK", name, initialState, goalState, ActionPlanState.STUCK);
-            } catch (CompleteAtStartException e){
-                resultWriter.writeStringResult("NOTHING_NEEDS_TO_BE_DONE", name, initialState, goalState, ActionPlanState.DO_NOTHING);
+                resultWriter.writeResult(plan, name, initialState, goalState, PlannerState.NORMAL);
+            } catch (UnsolvableException e) {
+                resultWriter.writeStringResult("UNSOLVABLE", name, initialState, goalState, PlannerState.UNSOLVABLE);
+            } catch (StuckException e) {
+                resultWriter.writeStringResult("STRIPS_STUCK", name, initialState, goalState, PlannerState.STUCK);
+            } catch (CompleteAtStartException e) {
+                resultWriter.writeStringResult("NOTHING_NEEDS_TO_BE_DONE", name, initialState, goalState, PlannerState.DO_NOTHING);
             }
         }
 

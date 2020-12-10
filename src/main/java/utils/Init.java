@@ -1,8 +1,8 @@
 package utils;
 
-import STRIPSAlg.Action;
-import STRIPSAlg.Condition;
-import STRIPSAlg.Element;
+import stripsAlg.Action;
+import stripsAlg.Condition;
+import stripsAlg.Element;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -28,14 +28,6 @@ public class Init {
         return allActions;
     }
 
-    public static HashSet<Condition> initializeCurrentStateWith(String[] states) {
-        HashSet<Condition> currentState = new HashSet<>();
-        for (String state : states) {
-            currentState.add(new Condition(state));
-        }
-        return currentState;
-    }
-
     public static Stack<Element> initializeGoalStackWith(String[] goalStackArr) {
         //put multi part goal on stack
         Stack<Element> elementStack = new Stack<>();
@@ -47,11 +39,11 @@ public class Init {
         return elementStack;
     }
 
-    public static HashSet<Condition> initializeGoalStateWith(String[] goalStackArr) {
-        HashSet<Condition> goalState = new HashSet<>();
-        for (String s : goalStackArr) {
-            goalState.add(new Condition(s));
+    public static HashSet<Condition> initializeStateWith(String[] conditionStrArr) {
+        HashSet<Condition> stateHashSet = new HashSet<>();
+        for (String conditionStr : conditionStrArr) {
+            stateHashSet.add(new Condition(conditionStr));
         }
-        return goalState;
+        return stateHashSet;
     }
 }

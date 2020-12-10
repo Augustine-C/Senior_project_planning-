@@ -1,8 +1,8 @@
-package STRIPSAlg;
+package stripsAlg;
 
-import utils.Enums.ElementType;
+import utils.enums.ElementType;
 
-public class Element {
+public class Element implements Cloneable {
     public ElementType elementType;
     private String[] items;
     public String nameOfActionOrState;  // If the Element records an action, this will be the name of that action
@@ -39,10 +39,13 @@ public class Element {
 
     @Override
     public boolean equals(Object element){
+        if (element.getClass() != this.getClass()) {
+            return false;
+        }
         return this.toString().equalsIgnoreCase(element.toString());
     }
 
-    protected void parseStateString(String name) {
+    public void parseStateString(String name) {
         // "On(a,b)"
         int openBracket = name.indexOf('(');
         int closeBracket = name.indexOf(')');
