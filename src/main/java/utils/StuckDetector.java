@@ -41,7 +41,13 @@ public class StuckDetector {
                 goalStackStringArr[i] = element.toString() + "\n";
             }
         }
-        return goalStackStringArr;
+        return reverseArray(goalStackStringArr);
+    }
+
+    public static String[] reverseArray(String[] goalStackStringArr) {
+        List<String> goalStackStringLst = Arrays.asList(goalStackStringArr);
+        Collections.reverse(goalStackStringLst);
+        return goalStackStringLst.toArray(goalStackStringArr);
     }
 
     public boolean detectCycle() {
