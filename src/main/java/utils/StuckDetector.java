@@ -50,7 +50,21 @@ public class StuckDetector {
         return goalStackStringLst.toArray(goalStackStringArr);
     }
 
-    public boolean detectCycle() {
+    public boolean detectCycle(List<Action> currentPlan) {
+        for (int i = 0; i < currentPlan.size() - 1; i++){
+            Action currAction = currentPlan.get(i);
+            Action nextAction = currentPlan.get(i + 1);
+            if (currAction.getName().equals("STACK") && nextAction.getName().equals("UNSTACK") && Arrays.equals(currAction.getItems(), nextAction.getItems())){
+                return true;
+            } else if (currAction.getName().equals("UNSTACK") && nextAction.getName().equals("STACK") && Arrays.equals(currAction.getItems(), nextAction.getItems())){
+                return true;
+            } else if (currAction.getName().equals("PICK_UP") && nextAction.getName().equals("PUT_DOWN") && Arrays.equals(currAction.getItems(), nextAction.getItems())){
+                return true;
+            } else if (currAction.getName().equals("PUT_DOWN") && nextAction.getName().equals("PICK_UP") && Arrays.equals(currAction.getItems(), nextAction.getItems())){
+                return true;
+            }
+        }
+
         Iterator<String[]> itr = goalStackLog.iterator();
         Set<String[]> set = new HashSet<>();
 

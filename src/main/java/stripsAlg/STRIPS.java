@@ -5,6 +5,7 @@ import utils.enums.ElementType;
 import utils.exceptions.*;
 
 import java.util.*;
+import java.util.concurrent.TimeoutException;
 
 public class STRIPS {
 
@@ -16,6 +17,7 @@ public class STRIPS {
     private final boolean printGoalStack; // This is an indicator on whether debugging information about goal stack needs to be printed, true for printing the goal stack, otherwise false
     private int whileLoopCount = 0; // This is the counter for while loop in step(). This is used for debugging purposes
     private final StuckDetector stuckDetector; // This is the stuck detector that helps us determine whether STRIPS planner is stuck.
+    private final long timeThreshold;
     /**
      * This is where the planning works get done
      *
@@ -24,7 +26,7 @@ public class STRIPS {
      * @param printGoalStack This is an indicator on whether debugging information about goal stack needs to be printed, true for printing the goal stack, otherwise false
      * @throws CompleteAtStartException If the initial state matches the goal state at the beginning, this exception will be thrown
      */
-    public STRIPS(String[] initStatesArr, String[] goalStateArr, Boolean printGoalStack) throws CompleteAtStartException {
+    public STRIPS(String[] initStatesArr, String[] goalStateArr, Boolean printGoalStack, long timeThreshold) throws CompleteAtStartException {
 
         if (Arrays.equals(initStatesArr, goalStateArr)) {
             throw new CompleteAtStartException();
@@ -39,6 +41,7 @@ public class STRIPS {
         this.goalStack = Init.initializeGoalStackWith(goalStateArr);
         this.printGoalStack = printGoalStack;
         stuckDetector = new StuckDetector(this.goalState);
+        this.timeThreshold = timeThreshold;
     }
 
     /**
@@ -48,20 +51,29 @@ public class STRIPS {
      * @throws UnsolvableException If the problem cannot be solved by the planner, we will throw this UnsolvableException
      * @throws StuckException      If the planner got stuck, we will throw this StuckException
      */
-    public List<Action> getPlan() throws UnsolvableException, StuckException {
+    public List<Action> getPlan() throws UnsolvableException, StuckException, TimeoutException {
         if (printGoalStack) {
             System.out.println();
             System.out.println("------------------------------");
             System.out.println("Debug Information - Goal Stack");
             System.out.println("------------------------------");
         }
+        long startTime = System.currentTimeMillis();
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
 
-        while (!goalStack.empty()) {
+        while (!goalStack.empty() && elapsedTime <= timeThreshold) {
             stuckDetector.logGoalStack(goalStack);
-            if (stuckDetector.detectCycle()) {
+            if (stuckDetector.detectCycle(this.plan)) {
                 throw new StuckException();
             }
             step();
+            endTime = System.currentTimeMillis();
+            elapsedTime = endTime - startTime;
+        }
+
+        if (elapsedTime > timeThreshold){
+            throw new TimeoutException();
         }
 
         if (printGoalStack) {
@@ -99,6 +111,11 @@ public class STRIPS {
         if (printGoalStack) {
             System.out.printf("While Loop Count: %d%n", whileLoopCount);
             System.out.println(Arrays.asList(StuckDetector.getGoalStackStringArr(goalStack)));
+            System.out.println("-----Plan-------");
+            for (Action action : this.plan){
+                System.out.println(action.getOutputString());
+            }
+            System.out.println("-----END Plan-------");
             whileLoopCount++;
         }
     }
