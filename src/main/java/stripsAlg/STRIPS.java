@@ -85,10 +85,12 @@ public class STRIPS {
             doAction(nextElement);
         } else if (isConditionFullyAchieved(nextElement)) { // It is either a single part goal or a multi part goal
             goalStack.pop();
-        } else if (nextElement.elementType == ElementType.MULTI_PART_CONDITION) {
+        }
+        else if (nextElement.elementType == ElementType.MULTI_PART_CONDITION) {
             // Multi-con
             planMultiPartCondition((MultiCondition) nextElement);
-        } else if (nextElement.elementType == ElementType.SINGLE_PART_CONDITION) { // The goal is single part goal
+        }
+        else if (nextElement.elementType == ElementType.SINGLE_PART_CONDITION) { // The goal is single part goal
             planSinglePartCondition((Condition) nextElement);
         } else {
             throw new IllegalStateException("[STRIPS.attemptNextGoal] The goal is not an Action, not a SinglePartGoal, also not a MultiPartGoal");
@@ -214,37 +216,31 @@ public class STRIPS {
     /**
      * This method can help us check whether a goal has been achieved under current state
      *
-     * @param condition this is the condition we want to check about whether it has been achieved
+     * @param element this is the condition we want to check about whether it has been achieved
      * @return it will return a Boolean value that true means the input is achieved, otherwise false.
      */
-    private boolean isConditionFullyAchieved(Element condition) {
-        if (condition.elementType == ElementType.MULTI_PART_CONDITION) {
-            ArrayList<Condition> multiPartGoals = ((MultiCondition)condition).getConditions();
-            boolean conditionNotFullyAchieved = true;
+    private boolean isConditionFullyAchieved(Element element) {
+        if (element.elementType == ElementType.MULTI_PART_CONDITION) {
 
-            for (Condition goalPart : multiPartGoals) {
-                conditionNotFullyAchieved = true;
-                for (Condition statePart : currentState) {
-                    if (goalPart.equals(statePart)) {
-                        conditionNotFullyAchieved = false;
+            ArrayList<Condition> conditions = ((MultiCondition) element).getConditions();
+            for (Condition condition : conditions){
+                boolean thisGoalSatisfied = false;
+                for (Condition state : currentState){
+                    if (condition.equals(state)){
+                        thisGoalSatisfied = true;
                         break;
                     }
                 }
-                if (conditionNotFullyAchieved) {
-                    for (Condition goalPartNeedToDo : multiPartGoals) {
-                        // If not all goals are achieved, we will store all parts of goals on Goal Stack
-                        // Each part of the goal is a single part goal
-                        goalStack.push(goalPartNeedToDo);
-                    }
-                    break;
+                if (!thisGoalSatisfied) {
+                    return false;
                 }
             }
-            return !conditionNotFullyAchieved;
-        } else if (condition.elementType == ElementType.SINGLE_PART_CONDITION) {
+            return true;
+        } else if (element.elementType == ElementType.SINGLE_PART_CONDITION) {
             boolean conditionAchieved = false;
 
             for (Condition currentStateCondition : currentState) {
-                if (currentStateCondition.toString().equalsIgnoreCase(condition.toString())) {
+                if (currentStateCondition.toString().equalsIgnoreCase(element.toString())) {
                     // If we achieved our sub goal, we will remove it from the stack.
                     conditionAchieved = true;
                     break;
@@ -262,6 +258,8 @@ public class STRIPS {
      * @param action this is the action that we want to store in the goal stack
      */
     private void pushPreconditionsToGoalStack(Action action) {
+        this.goalStack.pop();
+
         // Store the Action in the GoalStack
         this.goalStack.push(action);
 

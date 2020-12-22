@@ -12,7 +12,7 @@ import java.util.List;
 
 public class Main {
 
-    final static Boolean PRINT_GOAL_STACK = false;
+    final static Boolean PRINT_GOAL_STACK = true;
     final static OutputFormat OUTPUT_FORMAT = OutputFormat.JSON;
 
     public static void main(String[] args) {
