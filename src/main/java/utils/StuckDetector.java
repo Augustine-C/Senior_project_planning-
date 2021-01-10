@@ -1,7 +1,6 @@
 package utils;
 
 import stripsAlg.Action;
-import stripsAlg.Condition;
 import stripsAlg.Element;
 import utils.enums.ElementType;
 
@@ -9,22 +8,15 @@ import java.util.*;
 
 public class StuckDetector {
 
-    private static int CYCLE_THRESHOLD;
     private final LinkedList<String[]> goalStackLog = new LinkedList<>();
+    private static Map<String, String> undoActionMap = new HashMap<String, String>() {{
+        put("STACK", "UNSTACK");
+        put("UNSTACK", "STACK");
+        put("PICK_UP", "PUT_DOWN");
+        put("PUT_DOWN", "PICK_UP");
+    }};
 
-    public StuckDetector(HashSet<Condition> state){
-        int objectCount = getNumberOfObjects(state);
-        CYCLE_THRESHOLD = objectCount * objectCount * objectCount;
-    }
-
-    private int getNumberOfObjects(HashSet<Condition> state) {
-        HashSet<String> objectSet = new HashSet<>();
-        for (Condition condition : state){
-            if (condition.getItems() != null){
-                objectSet.addAll(Arrays.asList(condition.getItems()));
-            }
-        }
-        return objectSet.size();
+    public StuckDetector(){
     }
 
     public void logGoalStack(Stack<Element> goalStack){
@@ -53,34 +45,12 @@ public class StuckDetector {
     public boolean detectCycle(List<Action> currentPlan) {
         for (int i = 0; i < currentPlan.size() - 1; i++){
             Action currAction = currentPlan.get(i);
+            String currActionName = currAction.getName();
             Action nextAction = currentPlan.get(i + 1);
-            if (currAction.getName().equals("STACK") && nextAction.getName().equals("UNSTACK") && Arrays.equals(currAction.getItems(), nextAction.getItems())){
-                return true;
-            } else if (currAction.getName().equals("UNSTACK") && nextAction.getName().equals("STACK") && Arrays.equals(currAction.getItems(), nextAction.getItems())){
-                return true;
-            } else if (currAction.getName().equals("PICK_UP") && nextAction.getName().equals("PUT_DOWN") && Arrays.equals(currAction.getItems(), nextAction.getItems())){
-                return true;
-            } else if (currAction.getName().equals("PUT_DOWN") && nextAction.getName().equals("PICK_UP") && Arrays.equals(currAction.getItems(), nextAction.getItems())){
-                return true;
+            String nextActionName = nextAction.getName();
+            if (Arrays.equals(currAction.getItems(), nextAction.getItems())){
+                return nextActionName.equals(undoActionMap.get(currActionName));
             }
-        }
-
-        Iterator<String[]> itr = goalStackLog.iterator();
-        Set<String[]> set = new HashSet<>();
-
-        String[] curr;
-        int cycleCount = 0;
-        while (itr.hasNext()) {
-            curr = itr.next();
-            for (String[] element : set) {
-                if (Arrays.equals(element, curr)) {
-                    cycleCount++;
-                }
-                if (cycleCount > CYCLE_THRESHOLD) {
-                    return true;
-                }
-            }
-            set.add(curr);
         }
 
         return false;
