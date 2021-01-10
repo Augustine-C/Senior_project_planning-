@@ -9,6 +9,12 @@ import java.util.*;
 public class StuckDetector {
 
     private final LinkedList<String[]> goalStackLog = new LinkedList<>();
+    private static Map<String, String> undoActionMap = new HashMap<String, String>() {{
+        put("STACK", "UNSTACK");
+        put("UNSTACK", "STACK");
+        put("PICK_UP", "PUT_DOWN");
+        put("PUT_DOWN", "PICK_UP");
+    }};
 
     public StuckDetector(){
     }
@@ -39,15 +45,11 @@ public class StuckDetector {
     public boolean detectCycle(List<Action> currentPlan) {
         for (int i = 0; i < currentPlan.size() - 1; i++){
             Action currAction = currentPlan.get(i);
+            String currActionName = currAction.getName();
             Action nextAction = currentPlan.get(i + 1);
-            if (currAction.getName().equals("STACK") && nextAction.getName().equals("UNSTACK") && Arrays.equals(currAction.getItems(), nextAction.getItems())){
-                return true;
-            } else if (currAction.getName().equals("UNSTACK") && nextAction.getName().equals("STACK") && Arrays.equals(currAction.getItems(), nextAction.getItems())){
-                return true;
-            } else if (currAction.getName().equals("PICK_UP") && nextAction.getName().equals("PUT_DOWN") && Arrays.equals(currAction.getItems(), nextAction.getItems())){
-                return true;
-            } else if (currAction.getName().equals("PUT_DOWN") && nextAction.getName().equals("PICK_UP") && Arrays.equals(currAction.getItems(), nextAction.getItems())){
-                return true;
+            String nextActionName = nextAction.getName();
+            if (Arrays.equals(currAction.getItems(), nextAction.getItems())){
+                return nextActionName.equals(undoActionMap.get(currActionName));
             }
         }
 
