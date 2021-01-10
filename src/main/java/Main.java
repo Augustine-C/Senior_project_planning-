@@ -16,10 +16,10 @@ import java.util.concurrent.*;
 
 public class Main {
 
-    final static Boolean PRINT_GOAL_STACK = true;
-    final static OutputFormat OUTPUT_FORMAT = OutputFormat.JSON;
+    final static Boolean PRINT_GOAL_STACK = false;
+    final static OutputFormat OUTPUT_FORMAT = OutputFormat.PRINT_ONLY;
     final static long TIMEOUT_THRESHOLD = 2000;
-    final static Boolean CONCURRENCY = false;
+//    final static Boolean CONCURRENCY = false;
 
     public static void main(String[] args) {
         List<String> names = InputReader.readNames("");
@@ -27,32 +27,32 @@ public class Main {
         List<String[]> goalStates = InputReader.readGoalStates("");
         ResultWriter resultWriter = new ResultWriter(OUTPUT_FORMAT);
 
-        if (CONCURRENCY){
-            List<Thread> threadList = new ArrayList<>();
-            threadList.add(new Thread());
-            for (int i = 0; i < names.size(); i++) {
-                String name = names.get(i);
-                String[] initialState = initialStates.get(i);
-                String[] goalState = goalStates.get(i);
-
-                Thread thread = new StripsRunner(name, initialState, goalState, PRINT_GOAL_STACK, resultWriter, TIMEOUT_THRESHOLD);
-                thread.setName(name);
-                threadList.add(thread);
-            }
-            for (int i = 0; i < threadList.size() - 1; i++){
-                Thread timerThread = new Thread();
-                threadList.get(i).start();
-                timerThread.start();
-            }
-            for (Thread thread : threadList) {
-                try {
-                    thread.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            System.exit(0);
-        } else {
+//        if (CONCURRENCY){
+//            List<Thread> threadList = new ArrayList<>();
+//            threadList.add(new Thread());
+//            for (int i = 0; i < names.size(); i++) {
+//                String name = names.get(i);
+//                String[] initialState = initialStates.get(i);
+//                String[] goalState = goalStates.get(i);
+//
+//                Thread thread = new StripsRunner(name, initialState, goalState, PRINT_GOAL_STACK, resultWriter, TIMEOUT_THRESHOLD);
+//                thread.setName(name);
+//                threadList.add(thread);
+//            }
+//            for (int i = 0; i < threadList.size() - 1; i++){
+//                Thread timerThread = new Thread();
+//                threadList.get(i).start();
+//                timerThread.start();
+//            }
+//            for (Thread thread : threadList) {
+//                try {
+//                    thread.join();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            System.exit(0);
+//        } else {
             for (int i = 0; i < names.size(); i++) {
                 String name = names.get(i);
                 String[] initialState = initialStates.get(i);
@@ -75,7 +75,7 @@ public class Main {
                 System.out.println("Completed task: " + name);
             }
 
-        }
+//        }
 
 
 
