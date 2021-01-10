@@ -18,7 +18,7 @@ public class Main {
 
     final static Boolean PRINT_GOAL_STACK = true;
     final static OutputFormat OUTPUT_FORMAT = OutputFormat.JSON;
-    final static long TIMEOUT_THRESHOLD = 5000;
+    final static long TIMEOUT_THRESHOLD = 2000;
     final static Boolean CONCURRENCY = false;
 
     public static void main(String[] args) {

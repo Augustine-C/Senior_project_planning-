@@ -40,7 +40,7 @@ public class STRIPS {
         this.goalState = Init.initializeStateWith(goalStateArr);
         this.goalStack = Init.initializeGoalStackWith(goalStateArr);
         this.printGoalStack = printGoalStack;
-        stuckDetector = new StuckDetector(this.goalState);
+        stuckDetector = new StuckDetector();
         this.timeThreshold = timeThreshold;
     }
 
