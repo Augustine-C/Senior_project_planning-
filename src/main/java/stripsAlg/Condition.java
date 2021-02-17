@@ -2,10 +2,18 @@ package stripsAlg;
 
 import utils.enums.ElementType;
 
+/**
+ * Single part condition extending the element super class
+ */
 public class Condition extends Element {
 
 //    private final String[] conditions;
 
+    /**
+     * Condition constructor populated with state information and element type being set to Single Part Condition
+     *
+     * @param stateString   String containing state information of this condition
+     */
     public Condition(String stateString) { // ON(C,B)
         super();
 //        String[] conditions = stateString.split(" ");

@@ -4,8 +4,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Provide methods for initializing the STRIPS environment with situations, initial states, and goal states.
+ */
 public class InputReader {
 
+    /**
+     * Return a list of available situations in this STRIPS world
+     *
+     * @return an ArrayList of strings of the name of available situations
+     */
     private static List<String> readNames() {
         return new ArrayList<>(Arrays.asList(
                 "Easy Condition",
@@ -17,6 +25,11 @@ public class InputReader {
         ));
     }
 
+    /**
+     * Return a list of initial states of every situation
+     *
+     * @return an ArrayList of arrays of Strings of condition.
+     */
     private static List<String[]> readInitStates() {
         return new ArrayList<>(Arrays.asList(
                 new String[]{"ON_TABLE(a)", "ON_TABLE(b)", "CLEAR(a)", "CLEAR(b)", "ARM_EMPTY"}, // easyInitialState
@@ -28,6 +41,11 @@ public class InputReader {
         ));
     }
 
+    /**
+     * Return a list of goal states of every situation
+     *
+     * @return an ArrayList of arrays of Strings of condition for the destination of each problem
+     */
     private static List<String[]> readGoalStates() {
 
         return new ArrayList<>(Arrays.asList(
@@ -40,6 +58,12 @@ public class InputReader {
         ));
     }
 
+    /**
+     * For adding a new situation to the STRIPS world.
+     *
+     * @param inputFormat   the name of the new situation
+     * @return namesList    created new list of strings of name of the situations of the STRIPS world
+     */
     public static List<String> readNames(String inputFormat) {
         List<String> namesList = new ArrayList<>();
         switch (inputFormat) {
@@ -54,6 +78,12 @@ public class InputReader {
         return namesList;
     }
 
+    /**
+     * For adding new initial states for a new problem/situation
+     *
+     * @param inputFormat           a string containing information about the initial states
+     * @return initialStatesList    created new initial state lists
+     */
     public static List<String[]> readInitStates(String inputFormat) {
         List<String[]> initialStatesList = new ArrayList<>();
         switch (inputFormat) {
@@ -68,6 +98,12 @@ public class InputReader {
         return initialStatesList;
     }
 
+    /**
+     * For adding new goal states for a new problem/situation
+     *
+     * @param inputFormat           a string containing information about the goal states
+     * @return goalStatesList       created new goal state lists
+     */
     public static List<String[]> readGoalStates(String inputFormat) {
         List<String[]> goalStatesList = new ArrayList<>();
         switch (inputFormat) {

@@ -17,18 +17,20 @@ public class STRIPS {
     private final boolean printGoalStack; // This is an indicator on whether debugging information about goal stack needs to be printed, true for printing the goal stack, otherwise false
     private int whileLoopCount = 0; // This is the counter for while loop in step(). This is used for debugging purposes
     private final StuckDetector stuckDetector; // This is the stuck detector that helps us determine whether STRIPS planner is stuck.
-    private final long timeThreshold;
+    private final long timeThreshold; // Time threshold set for terminating STRIPS planner
+
     /**
      * This is where the planning works get done
      *
      * @param initStatesArr  this is the description of the initial state in String Array
      * @param goalStateArr   this is the description of the goal state in String Array
      * @param printGoalStack This is an indicator on whether debugging information about goal stack needs to be printed, true for printing the goal stack, otherwise false
+     * @param timeThreshold Time threshold set for terminating STRIPS planner
      * @throws CompleteAtStartException If the initial state matches the goal state at the beginning, this exception will be thrown
      */
     public STRIPS(String[] initStatesArr, String[] goalStateArr, Boolean printGoalStack, long timeThreshold) throws CompleteAtStartException {
 
-        if (Arrays.equals(initStatesArr, goalStateArr)) {
+        if (Arrays.equals(initStatesArr, goalStateArr)) { // When the starting conditions is equal to the goal conditions
             throw new CompleteAtStartException();
         }
 
@@ -50,6 +52,7 @@ public class STRIPS {
      * @return the plan in List of Actions in sequence to achieve the goal state
      * @throws UnsolvableException If the problem cannot be solved by the planner, we will throw this UnsolvableException
      * @throws StuckException      If the planner got stuck, we will throw this StuckException
+     * @throws TimeoutException    If the planner runs over the time threshold, throw TimeoutException
      */
     public List<Action> getPlan() throws UnsolvableException, StuckException, TimeoutException {
         if (printGoalStack) {
@@ -97,12 +100,10 @@ public class STRIPS {
             doAction(nextElement);
         } else if (isConditionFullyAchieved(nextElement)) { // It is either a single part goal or a multi part goal
             goalStack.pop();
-        }
-        else if (nextElement.elementType == ElementType.MULTI_PART_CONDITION) {
+        } else if (nextElement.elementType == ElementType.MULTI_PART_CONDITION) {
             // Multi-con
             planMultiPartCondition((MultiCondition) nextElement);
-        }
-        else if (nextElement.elementType == ElementType.SINGLE_PART_CONDITION) { // The goal is single part goal
+        } else if (nextElement.elementType == ElementType.SINGLE_PART_CONDITION) { // The goal is single part goal
             planSinglePartCondition((Condition) nextElement);
         } else {
             throw new IllegalStateException("[STRIPS.attemptNextGoal] The goal is not an Action, not a SinglePartGoal, also not a MultiPartGoal");
@@ -153,7 +154,7 @@ public class STRIPS {
             }
         }
 
-        // add from results of action in currentState
+        // add from results/(post-conditions) of action in currentState
         for (int i = 0; i < newAction.results.size(); i++) {
             this.currentState.add(new Condition(newAction.results.get(i).toString()));
         }
@@ -217,7 +218,7 @@ public class STRIPS {
     }
 
     /**
-     * This method will help us plan the Single Part Condition
+     * This method will help us plan the Single Part Condition / Single part handler
      *
      * @param condition this is an condition that we want to solve by finding best action for it
      * @throws UnsolvableException This exception will be thrown if we are not able to find a best action
@@ -234,21 +235,20 @@ public class STRIPS {
      * This method can help us check whether a goal has been achieved under current state
      *
      * @param element this is the condition we want to check about whether it has been achieved
-     * @return it will return a Boolean value that true means the input is achieved, otherwise false.
+     * @return it will return a Boolean value that is true if the input is achieved, otherwise false.
      */
     private boolean isConditionFullyAchieved(Element element) {
         if (element.elementType == ElementType.MULTI_PART_CONDITION) {
-
             ArrayList<Condition> conditions = ((MultiCondition) element).getConditions();
-            for (Condition condition : conditions){
+            for (Condition condition : conditions){ // For all goal states
                 boolean thisGoalSatisfied = false;
-                for (Condition state : currentState){
+                for (Condition state : currentState){ // check if current states contain the goal state 
                     if (condition.equals(state)){
                         thisGoalSatisfied = true;
                         break;
                     }
                 }
-                if (!thisGoalSatisfied) {
+                if (!thisGoalSatisfied) { // If a goal is not satisfies, return false
                     return false;
                 }
             }
@@ -281,16 +281,15 @@ public class STRIPS {
         this.goalStack.push(action);
 
         // Store the multi part goals in the GoalStack
-        // Multi-con
         this.goalStack.push(new MultiCondition(action.getPreconditionString()));
     }
 
     /**
      * This is the Heuristic method that help us get the best action for the given state that we want to achieve
      *
-     * @param condition this is the condition that we want to find action to achieve
+     * @param condition this is the condition that we want to find action for
      * @return an Action will be returned to achieve the given condition. If we cannot achieve the given condition, it will return null
-     * @throws UnsolvableException This exception will be thrown if we are not able to find a best action
+     * @throws UnsolvableException This exception will be thrown if we are not able to find the best action
      */
     private Action findBestAction(Condition condition) throws UnsolvableException {
         // Heuristic

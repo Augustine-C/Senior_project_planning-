@@ -8,8 +8,17 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Stack;
 
+
+/**
+ * Initializing the available actions. Provide functions for initializing the goal stack with conditions.
+ */
 public class Init {
 
+    /**
+     * Return all available actions within this STRIPS world
+     *
+     * @return allActions   A linkedlist of actions contaning all actions with their preconditions and postconditions
+     */
     public static LinkedList<Action> initializeAllActions() {
         LinkedList<Action> allActions = new LinkedList<>();
 
@@ -28,6 +37,12 @@ public class Init {
         return allActions;
     }
 
+    /**
+     * Return a stack containing all elements inputted into the function
+     *
+     * @param goalStackArr      An array of String containing information about the goal condition
+     * @return elementStack     A stack of element with all inputted goal strings converted to conditions
+     */
     public static Stack<Element> initializeGoalStackWith(String[] goalStackArr) {
         //put multi part goal on stack
         Stack<Element> elementStack = new Stack<>();
@@ -39,6 +54,12 @@ public class Init {
         return elementStack;
     }
 
+    /**
+     * Return a hashset of states containing all elements inputted into the function
+     *
+     * @param conditionStrArr   An array of String containing information about states
+     * @return stateHashSet     A hashset containing all conditions of inputted state with String converted to Condition data class
+     */
     public static HashSet<Condition> initializeStateWith(String[] conditionStrArr) {
         HashSet<Condition> stateHashSet = new HashSet<>();
         for (String conditionStr : conditionStrArr) {

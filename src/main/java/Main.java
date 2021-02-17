@@ -13,16 +13,17 @@ import java.util.concurrent.*;
 
 public class Main {
 
-    final static Boolean PRINT_GOAL_STACK = false;
-    final static OutputFormat OUTPUT_FORMAT = OutputFormat.JSON;
-    final static long TIMEOUT_THRESHOLD = 2000;
+    final static Boolean PRINT_GOAL_STACK = false; // print the stack or not
+    final static OutputFormat OUTPUT_FORMAT = OutputFormat.JSON; // specifying an output format
+    final static long TIMEOUT_THRESHOLD = 2000; // set planner time threshold
 
     public static void main(String[] args) {
-        List<String> names = InputReader.readNames("");
-        List<String[]> initialStates = InputReader.readInitStates("");
-        List<String[]> goalStates = InputReader.readGoalStates("");
+        List<String> names = InputReader.readNames(""); // read in all problems/situations
+        List<String[]> initialStates = InputReader.readInitStates(""); // read in all initial states
+        List<String[]> goalStates = InputReader.readGoalStates(""); // read in all goal states
         ResultWriter resultWriter = new ResultWriter(OUTPUT_FORMAT);
 
+        // Run the planner
         for (int i = 0; i < names.size(); i++) {
             String name = names.get(i);
             String[] initialState = initialStates.get(i);

@@ -14,23 +14,48 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * For writing output of STRIPS algo to designated files given designated formats
+ */
 public class ResultWriter {
-
-    private final OutputFormat outputFormat;
+    private final OutputFormat outputFormat; // specified output format, could be print xml, JSON, txt
     private Boolean isFirstOutput = true;
     private static FileWriter fileWriter;
-    private final static String FOLDER_PATH = "./ResultOutput/";
-    private final static String FILE_NAME = "ActionPlan";
+    private final static String FOLDER_PATH = "./ResultOutput/"; // folder name
+    private final static String FILE_NAME = "ActionPlan"; // file prefix
 
+    /**
+     * ResultWriter constructor for specifying an outputFormat for the output
+     *
+     * @param outputFormat         inputted output format, could be print, xml, JSON, txt
+     */
     public ResultWriter(OutputFormat outputFormat) {
         this.outputFormat = outputFormat;
     }
 
+    /**
+     * Write result for an unsolvable situation
+     *
+     * @param result            output from STRIPS algo
+     * @param name              the name of the problem/situation
+     * @param initialStates     the initial states of the problem/situation
+     * @param goalStates        the goal states of the problem/situation
+     * @param plannerState      planner's output status: "UNSOLVABLE"
+     */
     public void writeStringResult(String result, String name, String[] initialStates, String[] goalStates, PlannerState plannerState) {
         Action UnsolvableAction = new Action(result, "", "");
         writeResult(new ArrayList<>(Collections.singletonList(UnsolvableAction)), name, initialStates, goalStates, plannerState);
     }
 
+    /**
+     * Write string or file results for every situations of STRIPS world
+     *
+     * @param plan              outputted best action plan from STRIPS algo
+     * @param name              the name of the problem/situation
+     * @param initialStates     the initial states of the problem/situation
+     * @param goalStates        the goal states of the problem/situation
+     * @param plannerState      planner's output status: "NORMAL", etc.
+     */
     public void writeResult(List<Action> plan, String name, String[] initialStates, String[] goalStates, PlannerState plannerState) {
         if (outputFormat == OutputFormat.PRINT_ONLY) {
             writePrintOnly(plan, name, initialStates, goalStates);
@@ -39,6 +64,14 @@ public class ResultWriter {
         }
     }
 
+    /**
+     * Write print result and outputted to the console
+     *
+     * @param plan              outputted best action plan from STRIPS algo
+     * @param name              the name of the problem/situation
+     * @param initialStates     the initial states of the problem/situation
+     * @param goalStates        the goal states of the problem/situation
+     */
     private void writePrintOnly(List<Action> plan, String name, String[] initialStates, String[] goalStates) {
         System.out.println();
         System.out.println("--------------------------");
@@ -63,10 +96,26 @@ public class ResultWriter {
         System.out.println();
     }
 
+    /**
+     * Helper method for converting an action plan to a string
+     *
+     * @param plan         a list of actions showing the plan outputted by STRIPS
+     * @return a string of all actions of the plan
+     */
     private String planToString(List<Action> plan) {
         return String.join("\n", planToStringArr(plan));
     }
 
+    /**
+     * Write result to a file specified by the output format
+     *
+     * @param plan              outputted best action plan from STRIPS algo
+     * @param name              the name of the problem/situation
+     * @param initialStates     the initial states of the problem/situation
+     * @param goalStates        the goal states of the problem/situation
+     * @param plannerState      the state of the output: "NORMAL", "STUCK", etc.
+     * @param outputFormat      specified format for the output file: XML, JSON, TXT
+     */
     private void writeFile(List<Action> plan, String name, String[] initialStates, String[] goalStates, PlannerState plannerState, OutputFormat outputFormat) {
         String filePath = FOLDER_PATH + FILE_NAME + "_" + name.replace(" ", "_");
         try {
@@ -111,11 +160,30 @@ public class ResultWriter {
         }
     }
 
+    /**
+     * Convert an JSON object to XML
+     *
+     * @param plan              outputted best action plan from STRIPS algo
+     * @param name              the name of the problem/situation
+     * @param initialStates     the initial states of the problem/situation
+     * @param goalStates        the goal states of the problem/situation
+     * @param plannerState      the state of the output: "NORMAL", "STUCK", etc.
+     * @return xml string object
+     */
     private String getXMLOutput(List<Action> plan, String name, String[] initialStates, String[] goalStates, PlannerState plannerState) {
         JSONObject jsonObject = getJSONOutput(plan, name, initialStates, goalStates, plannerState);
         return XML.toString(jsonObject);
     }
 
+    /**
+     * Return a string for writing text results
+     *
+     * @param plan              outputted best action plan from STRIPS algo
+     * @param name              the name of the problem/situation
+     * @param initialStates     the initial states of the problem/situation
+     * @param goalStates        the goal states of the problem/situation
+     * @return a string containing text results
+     */
     private String getTXTOutput(List<Action> plan, String name, String[] initialStates, String[] goalStates) {
         System.out.println();
 
@@ -139,6 +207,16 @@ public class ResultWriter {
         return String.join("\n", stringList);
     }
 
+    /**
+     * Return JSON object for the result
+     *
+     * @param plan              outputted best action plan from STRIPS algo
+     * @param name              the name of the problem/situation
+     * @param initialStates     the initial states of the problem/situation
+     * @param goalStates        the goal states of the problem/situation
+     * @param plannerState      the state of the output: "NORMAL", "STUCK", etc.
+     * @return jSONObject       the JSON object containing necessary information of the result
+     */
     private JSONObject getJSONOutput(List<Action> plan, String name, String[] initialStates, String[] goalStates, PlannerState plannerState) {
         JSONObject actionPlanJSON = new JSONObject();
         actionPlanJSON.put("name", name);
@@ -183,6 +261,12 @@ public class ResultWriter {
         return jsonObject;
     }
 
+    /**
+     * Helper method for converting a list of action to an arraylist of strings.
+     *
+     * @param plan              a list of actions for outputted best action plan from STRIPS algo
+     * @return stringPlan       an arraylist of string of the plan's actions
+     */
     private ArrayList<String> planToStringArr(List<Action> plan) {
         ArrayList<String> stringPlan = new ArrayList<>();
         for (Action action : plan) {

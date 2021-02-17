@@ -5,12 +5,21 @@ import utils.enums.ElementType;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Action data sturcture for STRIPS algorithm, extending Element super class
+ */
 public class Action extends Element {
 
-    public final ArrayList<Condition> preconditions = new ArrayList<>();
-    public final ArrayList<Condition> results = new ArrayList<>();
+    public final ArrayList<Condition> preconditions = new ArrayList<>(); // Preconditions necessary for an action to happen
+    public final ArrayList<Condition> results = new ArrayList<>(); // Postconditions after an action has been done
 
-
+    /**
+     * Action constructor, constructing a new action based on given name, its preconditions, and its postconditions. Extend Element's fields
+     *
+     * @param name              the name of this action
+     * @param preconditions     preconditions necessary for an action to happen
+     * @param results           postconditions after an action has been done
+     */
     public Action(String name, String preconditions, String results) {
         super();
         parseStateString(name);
@@ -25,10 +34,20 @@ public class Action extends Element {
         }
     }
 
+    /**
+     * Get the name of this action
+     *
+     * @return nameOfActionOrState  the name field of Element
+     */
     public String getName(){
         return nameOfActionOrState;
     }
 
+    /**
+     * Return a String containing all preconditions of this action
+     *
+     * @return a String containing all the preconditions joined together separated with space
+     */
     public String getPreconditionString() {
         // Store the Preconditions for an action in the GoalStack
         List<String> preconditionList = new ArrayList<>();
@@ -38,6 +57,12 @@ public class Action extends Element {
         return String.join(" ", preconditionList);
     }
 
+    /**
+     * Check whether the goal is achieved based on whether the postconditions of this action meets with the goal
+     *
+     * @param goal              a String describing the goal to be met
+     * @return goalAchieved     true if one of postconditions satisfies the goal, false otherwise
+     */
     public boolean isGoalAchieved(String goal) {
         boolean goalAchieved = false;
 
@@ -51,6 +76,11 @@ public class Action extends Element {
         return goalAchieved;
     }
 
+    /**
+     * Deep copying this action element and return a new action
+     *
+     * @return new Action with every fields hold the same value as this action
+     */
     @Override
     public Action clone() {
         try {
@@ -75,10 +105,20 @@ public class Action extends Element {
         );
     }
 
+    /**
+     * Return this action in a string format. For printing purposes
+     *
+     * @return calling Element's toString methods.
+     */
     public String getOutputString(){
         return super.toString();
     }
 
+    /**
+     * Return this action in a string format with preconditions and postconditions tagged properly. For printing purposes
+     *
+     * @return a String containing the name, preconditions, and postconditions of this action
+     */
     @Override
     public String toString() {
         return ("action: " + super.toString()
